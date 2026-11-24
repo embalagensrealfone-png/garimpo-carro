@@ -86,6 +86,13 @@ detalhe espalhado. O resto é cal (parede caiada) e papel.
 Desktop: peneira fixa à esquerda (270px), livro de compra à direita. Celular: a peneira vira
 uma gaveta que sobe de baixo; uma barra preta fixa mostra o contador "186 → N".
 
+**Página inicial** (`index.html`, 24/11/2026): a placa ouro inteira, com a vitrine à esquerda e
+"O que você está garimpando?" à direita (no celular, uma embaixo da outra). A vitrine tem 5 quadros
+pretos: a dor em letreiro branco, o garimpo em texto com filete ouro e um número real dos dados numa
+etiqueta ouro. Gira a cada 6,5 s, para com mouse, foco ou toque e não gira com movimento reduzido.
+O cartão do modelo é papel pregado (offset duro) com a foto da melhor pepita e abre `c300.html`, a
+lista. Links antigos com `#` caem direto na lista.
+
 ## Elevation & Depth
 Sem sombra borrada. Toda profundidade é offset duro, sem blur: realce de pincel no letreiro, e
 o papel das **pepitas** pregado na placa (`6px 6px 0` tinta, girado -0,6°). A placa tem filete
