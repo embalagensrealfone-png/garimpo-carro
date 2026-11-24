@@ -86,4 +86,80 @@
       img.src = `img/${tops[i].id}.jpg`;
     })(0);
   }).catch(() => { /* sem dados, as placas ficam com o texto e o traço */ });
+
+  // ── Pedido de garimpo: marca → modelo → versão saem da tabela FIPE (catalogo.json) ──
+  const WHATS = ''; // número da empresa com DDI e DDD, só dígitos (ex.: 5548999999999)
+  const UFS = 'AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO'.split(' ');
+  const bm = $('#b-marca'), bmod = $('#b-modelo'), bv = $('#b-versao');
+  const de = $('#b-ano-de'), ate = $('#b-ano-ate'), erro = $('#b-erro'), botao = $('#b-ir');
+  const opc = (sel, lista, primeira) => {
+    sel.innerHTML = '';
+    if (primeira) sel.add(new Option(primeira, ''));
+    lista.forEach((v) => sel.add(new Option(v, v)));
+  };
+  const anoAgora = new Date().getFullYear() + 1;
+  const anos = []; for (let a = anoAgora; a >= 2010; a--) anos.push(String(a));
+  opc(de, anos.slice().reverse(), 'de'); opc(ate, anos, 'até');
+
+  $('#b-ufs').innerHTML = UFS.map((u) => `<label><input type="checkbox" value="${u}"><span>${u}</span></label>`).join('');
+  const ufsMarcadas = () => [...document.querySelectorAll('#b-ufs input:checked')].map((i) => i.value);
+  $('#b-ufs').addEventListener('change', () => {
+    const u = ufsMarcadas();
+    $('#b-estados-rot').textContent = u.length ? (u.length > 6 ? `${u.length} estados` : u.join(', ')) : 'Brasil todo';
+  });
+
+  let CAT = {};
+  fetch('catalogo.json').then((r) => r.json()).then((c) => {
+    CAT = c; opc(bm, Object.keys(c), 'Escolha a marca');
+  }).catch(() => opc(bm, [], 'Não carregou, recarregue a página'));
+  bm.addEventListener('change', () => {
+    const mods = bm.value ? Object.keys(CAT[bm.value]) : [];
+    opc(bmod, mods, bm.value ? 'Escolha o modelo' : 'Escolha a marca'); bmod.disabled = !bm.value;
+    opc(bv, [], 'Qualquer versão'); bv.disabled = true; modo();
+  });
+  bmod.addEventListener('change', () => {
+    opc(bv, bmod.value ? CAT[bm.value][bmod.value] : [], 'Qualquer versão'); bv.disabled = !bmod.value; modo();
+  });
+  bv.addEventListener('change', modo);
+
+  // a C 300 AMG Line já está garimpada: em vez de pedir, abre a lista com a peneira pronta
+  const ehC300 = () => bm.value === 'Mercedes-Benz' && bmod.value === 'C 300' && (!bv.value || /AMG Line/.test(bv.value));
+  function modo() { botao.textContent = ehC300() ? 'Ver as C 300 já garimpadas' : 'Pedir garimpo no WhatsApp'; }
+
+  const reais = (el) => +el.value.replace(/\D/g, '') || 0;
+  [$('#b-pmin'), $('#b-pmax')].forEach((el) => el.addEventListener('input', () => {
+    const v = reais(el); el.value = v ? v.toLocaleString('pt-BR') : '';
+  }));
+
+  $('#busca').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const a1 = +de.value || 0, a2 = +ate.value || 0, p1 = reais($('#b-pmin')), p2 = reais($('#b-pmax'));
+    let msg = '';
+    if (!bm.value) msg = 'Escolha a marca.';
+    else if (!bmod.value) msg = 'Escolha o modelo.';
+    else if (a1 && a2 && a1 > a2) msg = 'O ano inicial está depois do final.';
+    else if (p1 && p2 && p1 > p2) msg = 'O preço mínimo está acima do máximo.';
+    erro.hidden = !msg; erro.textContent = msg;
+    if (msg) return;
+    const ufs = ufsMarcadas();
+
+    if (ehC300()) {
+      const q = new URLSearchParams();
+      const lista = [2022, 2023, 2024, 2025].filter((a) => (!a1 || a >= a1) && (!a2 || a <= a2));
+      if (lista.length && lista.length < 4) q.set('ano', lista.join(','));
+      if (ufs.length) q.set('uf', ufs.join(','));
+      if (p2) q.set('preco', p2);
+      location.href = 'c300.html' + (q.toString() ? '#' + q : '');
+      return;
+    }
+    const brl = (v) => 'R$ ' + v.toLocaleString('pt-BR');
+    const linhas = [
+      'Olá! Quero um garimpo pelo Garimpo Carro:',
+      `• Carro: ${bm.value} ${bmod.value}${bv.value ? ' ' + bv.value : ''}`,
+      `• Ano: ${a1 && a2 ? (a1 === a2 ? a1 : `${a1} a ${a2}`) : a1 ? `de ${a1} em diante` : a2 ? `até ${a2}` : 'qualquer'}`,
+      `• Preço: ${p1 && p2 ? `${brl(p1)} a ${brl(p2)}` : p1 ? `a partir de ${brl(p1)}` : p2 ? `até ${brl(p2)}` : 'qualquer'}`,
+      `• Estados: ${ufs.length ? ufs.join(', ') : 'Brasil todo'}`,
+    ];
+    window.open(`https://wa.me/${WHATS}?text=${encodeURIComponent(linhas.join('\n'))}`, '_blank', 'noopener');
+  });
 })();

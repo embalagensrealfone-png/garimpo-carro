@@ -511,3 +511,70 @@ a.modelo:hover .modelo-ir span { display: inline-block; transform: translateX(4p
 @media (prefers-reduced-motion: reduce) {
   .modelo, .vitrine-pontos button::before { transition: none; }
 }
+
+/* ── Pedido de garimpo (página inicial) ── */
+.busca {
+  background: var(--cal); border: 2px solid var(--tinta); border-radius: var(--placa);
+  box-shadow: 6px 6px 0 rgba(23,20,15,.35); padding: 16px 18px 18px;
+}
+.busca-t { margin: 0 0 12px; display: grid; gap: 3px; }
+.busca-t b { font: 400 1.3rem/1.05 var(--letreiro); }
+.busca-t span { font-size: .92rem; color: var(--tinta-2); }
+.busca-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+.campo { display: grid; gap: 4px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.campo-largo { grid-column: 1 / -1; }
+.campo > span, .campo legend, .estados summary > span {
+  font: 700 .78rem/1 var(--rotulo); letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-2); padding: 0;
+}
+.campo legend { margin-bottom: 4px; }
+.campo i { font-style: normal; letter-spacing: .04em; text-transform: none; font-weight: 500; }
+.busca select, .busca input {
+  width: 100%; min-width: 0; height: 42px; padding: 0 10px;
+  background: var(--papel); border: 2px solid var(--tinta); border-radius: 2px; font-size: .95rem;
+}
+.busca select:disabled { opacity: .5; }
+.campo-par { grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 6px; }
+.campo-par legend { grid-column: 1 / -1; }
+.campo-par em { font-style: normal; color: var(--tinta-2); font-size: .9rem; }
+.estados summary {
+  list-style: none; cursor: pointer; display: grid; gap: 4px;
+}
+.estados summary::-webkit-details-marker { display: none; }
+.estados summary b {
+  display: flex; align-items: center; justify-content: space-between; height: 42px; padding: 0 10px;
+  background: var(--papel); border: 2px solid var(--tinta); border-radius: 2px; font: 500 .95rem/1 var(--corpo);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.estados summary b::after { content: '▾'; margin-left: 8px; }
+.estados[open] summary b::after { content: '▴'; }
+.estados-lista {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 6px; margin-top: 8px;
+}
+.estados-lista label { cursor: pointer; }
+.estados-lista input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.estados-lista span {
+  display: block; text-align: center; padding: 8px 0 7px; border: 2px solid var(--tinta); border-radius: 2px;
+  background: var(--papel); font: 700 .9rem/1 var(--rotulo); letter-spacing: .06em;
+}
+.estados-lista input:checked + span { background: var(--tinta); color: var(--ouro); }
+.estados-lista input:focus-visible + span { outline: 3px solid var(--tinta); outline-offset: 2px; }
+.busca-erro { margin: 10px 0 0; color: var(--risco); font-weight: 600; font-size: .92rem; }
+.busca-ir {
+  margin-top: 14px; width: 100%; cursor: pointer; border: 2px solid var(--tinta); border-radius: 2px;
+  background: var(--tinta); color: var(--ouro); padding: 13px 16px 12px; box-shadow: var(--sombra-pincel);
+  font: 700 1.05rem/1 var(--rotulo); letter-spacing: .08em; text-transform: uppercase;
+}
+.busca-ir:hover { background: #2A251C; }
+.busca-ir:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--tinta); }
+@media (max-width: 380px) { .busca-grade { grid-template-columns: 1fr; } .busca-grade .campo { grid-column: 1 / -1; } }
+.inicio-corpo { grid-template-areas: "vitrine procura" "busca procura"; }
+.vitrine { grid-area: vitrine; } .procura { grid-area: procura; } .busca { grid-area: busca; align-self: start; }
+.busca-grade { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.busca-grade > .campo { grid-column: span 2; }
+.busca-grade > .campo-par { grid-column: span 3; }
+.busca-grade > .campo-largo { grid-column: span 6; }
+@media (max-width: 900px) {
+  .inicio-corpo { grid-template-areas: "vitrine" "procura" "busca"; }
+  .busca-grade > .campo, .busca-grade > .campo-par { grid-column: span 3; }
+}
+@media (max-width: 560px) { .busca-grade > .campo, .busca-grade > .campo-par { grid-column: span 6; } }

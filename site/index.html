@@ -92,10 +92,28 @@ Links antigos (#carro=…, filtros na URL) eram da lista: vão direto para c300.
         </span>
         <span class="modelo-ir">Abrir o garimpo <span aria-hidden="true">→</span></span>
       </a>
-      <div class="modelo modelo-breve" aria-disabled="true">
-        <span class="modelo-txt"><small>Próximo modelo</small><b>Em breve</b><span>A peneira vai crescer, um carro de cada vez.</span></span>
-      </div>
     </section>
+
+    <form class="busca" id="busca" novalidate aria-labelledby="busca-t">
+      <p class="busca-t"><b id="busca-t">Quer garimpar outro carro?</b><span>Diga o que procura. O pedido chega no nosso WhatsApp e a gente garimpa para você.</span></p>
+      <div class="busca-grade">
+        <label class="campo"><span>Marca</span><select id="b-marca" required><option value="">Carregando…</option></select></label>
+        <label class="campo"><span>Modelo</span><select id="b-modelo" required disabled><option value="">Escolha a marca</option></select></label>
+        <label class="campo"><span>Versão <i>(opcional)</i></span><select id="b-versao" disabled><option value="">Qualquer versão</option></select></label>
+        <fieldset class="campo campo-par"><legend>Ano</legend>
+          <select id="b-ano-de" aria-label="Ano de"></select><em>a</em><select id="b-ano-ate" aria-label="Ano até"></select>
+        </fieldset>
+        <fieldset class="campo campo-par"><legend>Preço (R$)</legend>
+          <input id="b-pmin" inputmode="numeric" placeholder="mínimo" aria-label="Preço mínimo"><em>a</em><input id="b-pmax" inputmode="numeric" placeholder="máximo" aria-label="Preço máximo">
+        </fieldset>
+        <details class="campo campo-largo estados" id="b-estados">
+          <summary><span>Estados</span><b id="b-estados-rot">Brasil todo</b></summary>
+          <div class="estados-lista" id="b-ufs"></div>
+        </details>
+      </div>
+      <p class="busca-erro" id="b-erro" role="alert" hidden></p>
+      <button type="submit" class="busca-ir" id="b-ir">Pedir garimpo no WhatsApp</button>
+    </form>
   </div>
 </header>
 
