@@ -345,8 +345,7 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
 .fipe-ref b { font-weight: 700; color: var(--tinta-2); font-variant-numeric: tabular-nums; letter-spacing: 0; font-size: 1.15rem; }
 @media (max-width: 1080px) { .fipe-ref { flex-basis: 100%; max-width: max-content; margin-bottom: 2px; } }
 /* Barra de ouro: o preço achado é o ouro do garimpo. Escolha do Carlos em 23/11/2026 (opção 3):
-   ouro metálico com reflexo, e um brilho que corre UMA vez quando o carro aparece e para no
-   lingote. Exceção consciente ao "sem brilho" do resto da casa — só o achado brilha. */
+   ouro metálico com reflexo, e um brilho que atravessa o lingote sem parar (a cada 3,5 s). Exceção consciente ao "sem brilho" do resto da casa — só o achado brilha. */
 .preco:not(.sem) { position: relative; isolation: isolate; display: inline-block; padding: 13px 24px 8px;
   color: #3B2A00; text-shadow: 0 1px 0 rgba(255,240,180,.7); }
 .preco:not(.sem)::before, .preco:not(.sem)::after { content: ""; position: absolute; z-index: -1; }
@@ -357,6 +356,7 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
   background:
     linear-gradient(115deg, transparent 42%, rgba(255,255,255,.95) 50%, transparent 58%) 43% 0 / 250% 100% no-repeat,
     linear-gradient(180deg, #FFF4B8 0, #F8D65A 10px, #E2AE1C 11px, #F6CC45 35%, #C8920E 70%, #9B6B00 100%);
-  animation: brilho-ouro 1.1s cubic-bezier(.3,.6,.3,1) .5s backwards; }
-@keyframes brilho-ouro { from { background-position: 100% 0, 0 0; } to { background-position: 43% 0, 0 0; } }
+  animation: brilho-ouro 3.5s ease-in-out .5s infinite; }
+/* o brilho atravessa o lingote e some; descansa e volta (pedido do Carlos: mexendo sempre) */
+@keyframes brilho-ouro { 0% { background-position: 100% 0, 0 0; } 40%, 100% { background-position: 0% 0, 0 0; } }
 @media (prefers-reduced-motion: reduce) { .preco:not(.sem)::after { animation: none; } }
