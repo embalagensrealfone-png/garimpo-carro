@@ -1,0 +1,257 @@
+// Garimpo Carro — a peneira roda toda no navegador: são menos de 200 carros, 80 KB de dados.
+(() => {
+  'use strict';
+  const $ = (s, r = document) => r.querySelector(s);
+  const reais = (v) => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+  const milKm = (v) => (v >= 1000 ? Math.round(v / 1000) + ' mil' : v) + ' km';
+  const semAcento = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const dataBR = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
+  const sobreFipe = (dif) => (dif == null ? null : Math.round(Math.abs(dif) * 100));
+
+  let D = [], ULT = '';
+  const PADRAO = { semLeilao: true, bl: 'todos', ano: [], uf: [], cor: [], banco: [], preco: 460000, km: 80000, cid: '', ordem: 'fipe' };
+  let F = { ...PADRAO };
+
+  // ── Estado na URL: quem compartilha o link manda a peneira junto ──
+  function lerUrl() {
+    const p = new URLSearchParams(location.hash.slice(1));
+    const lista = (k) => (p.get(k) ? p.get(k).split(',') : []);
+    F = {
+      ...PADRAO,
+      semLeilao: p.get('leilao') !== '1',
+      bl: p.get('bl') || 'todos',
+      ano: lista('ano'), uf: lista('uf'), cor: lista('cor'), banco: lista('banco'),
+      preco: +p.get('preco') || PADRAO.preco,
+      km: +p.get('km') || PADRAO.km,
+      cid: p.get('cid') || '',
+      ordem: p.get('ordem') || 'fipe',
+    };
+  }
+  function gravarUrl() {
+    const p = new URLSearchParams();
+    if (!F.semLeilao) p.set('leilao', '1');
+    if (F.bl !== 'todos') p.set('bl', F.bl);
+    for (const k of ['ano', 'uf', 'cor', 'banco']) if (F[k].length) p.set(k, F[k].join(','));
+    if (F.preco < PADRAO.preco) p.set('preco', F.preco);
+    if (F.km < PADRAO.km) p.set('km', F.km);
+    if (F.cid) p.set('cid', F.cid);
+    if (F.ordem !== 'fipe') p.set('ordem', F.ordem);
+    const h = p.toString();
+    history.replaceState(null, '', h ? '#' + h : location.pathname);
+  }
+
+  // ── Peneira ──
+  function passa(c, ignorar) {
+    if (F.semLeilao && c.leilao) return false;
+    if (F.bl === 'nao' && c.bl) return false;
+    if (F.bl === 'sim' && !c.bl) return false;
+    if (ignorar !== 'ano' && F.ano.length && !F.ano.includes(String(c.ano))) return false;
+    if (ignorar !== 'uf' && F.uf.length && !F.uf.includes(c.uf)) return false;
+    if (ignorar !== 'cor' && F.cor.length && !F.cor.includes(c.cor)) return false;
+    if (ignorar !== 'banco' && F.banco.length && !F.banco.includes(c.banco)) return false;
+    // preço não informado não é "barato": só entra quando a peneira de preço está aberta
+    if (F.preco < PADRAO.preco && !(c.preco > 0 && c.preco <= F.preco)) return false;
+    if (F.km < PADRAO.km && !(c.km > 0 && c.km <= F.km)) return false;
+    if (F.cid && !semAcento(c.cid).includes(semAcento(F.cid))) return false;
+    return true;
+  }
+  const ORDENS = {
+    // preço suspeito não é o "melhor negócio": vai depois dos limpos, ainda visível
+    fipe: (a, b) => suspeito(a) - suspeito(b) || (a.dif ?? 9) - (b.dif ?? 9),
+    recentes: (a, b) => b.dt.localeCompare(a.dt) || (a.dif ?? 9) - (b.dif ?? 9),
+    preco: (a, b) => (a.preco || 9e9) - (b.preco || 9e9),
+    km: (a, b) => (a.km || 9e9) - (b.km || 9e9),
+    ano: (a, b) => b.ano - a.ano || (a.dif ?? 9) - (b.dif ?? 9),
+  };
+
+  // ── Desenho ──
+  const tpl = $('#t-linha');
+  function linha(c) {
+    const li = tpl.content.firstElementChild.cloneNode(true);
+    li.id = c.id;
+    const principal = c.links[0];
+    const foto = $('.foto', li);
+    foto.href = principal.u;
+    foto.setAttribute('aria-label', 'Ver fotos no anúncio de ' + principal.s);
+    if (c.capa) {
+      const img = $('img', foto);
+      img.src = 'img/' + c.id + '.jpg';
+      img.alt = `C 300 ${c.ano} ${c.cor.toLowerCase()}`;
+    } else { foto.classList.add('sem'); foto.textContent = ''; }
+
+    const selos = $('.selos', li);
+    if (c.leilao) selos.insertAdjacentHTML('beforeend', '<span class="selo leilao">Passou por leilão</span>');
+    if (c.bl) selos.insertAdjacentHTML('beforeend', '<span class="selo blind">Blindado</span>');
+    if (c.dt === ULT) selos.insertAdjacentHTML('beforeend', `<span class="selo novo">Novo · ${dataBR(c.dt)}</span>`);
+    if (!selos.children.length) selos.remove();
+
+    const fab = c.fab && c.fab !== String(c.ano) ? `${c.fab}/${c.ano}` : String(c.ano);
+    $('.titulo', li).innerHTML = `C 300 ${fab} · ${esc(c.cor)} <small>banco ${esc(c.banco.toLowerCase())}</small>`;
+    const onde = c.cid ? `${esc(c.cid)}${c.uf && c.uf !== 'Não informado' ? '/' + c.uf : ''}` : (c.uf !== 'Não informado' ? c.uf : 'Cidade não informada');
+    $('.meta', li).innerHTML = [c.km ? `<b>${milKm(c.km)}</b>` : 'km não informado', onde, `na lista desde ${dataBR(c.dt)}`].join(' · ');
+
+    const al = $('.alertas', li);
+    // risco primeiro: do lado do comprador
+    const ordemAl = { risco: 0, bom: 1, nota: 2 };
+    c.al.filter((a) => !/leil/i.test(a.t) || !c.leilao || a.t.length > 40)
+      .sort((a, b) => ordemAl[a.k] - ordemAl[b.k])
+      .forEach((a) => al.insertAdjacentHTML('beforeend', `<li class="${a.k}">${esc(a.t)}</li>`));
+    if (c.al.some((a) => a.k === 'risco')) li.classList.add('tem-risco');
+    if (!al.children.length) al.remove();
+
+    const pr = $('.preco', li);
+    if (c.preco) pr.textContent = reais(c.preco); else { pr.textContent = 'Preço não informado'; pr.classList.add('sem'); }
+    const ca = $('.carimbo', li), p = sobreFipe(c.dif);
+    if (p == null) ca.classList.add('vazio');
+    else if (c.dif <= -0.02 && suspeito(c)) { ca.classList.add('suspeito'); ca.innerHTML = `${p}% abaixo · desconfie<small>FIPE ${c.ano}: ${reais(c.fipe)}</small>`; }
+    else if (c.dif <= -0.02) { ca.classList.add('abaixo'); ca.innerHTML = `${p}% abaixo da FIPE<small>FIPE ${c.ano}: ${reais(c.fipe)}</small>`; }
+    else if (c.dif >= 0.02) { ca.classList.add('acima'); ca.innerHTML = `${p}% acima da FIPE<small>FIPE ${c.ano}: ${reais(c.fipe)}</small>`; }
+    else { ca.classList.add('na'); ca.innerHTML = `Na FIPE<small>FIPE ${c.ano}: ${reais(c.fipe)}</small>`; }
+
+    const sites = $('.sites', li);
+    // um botão por site; o mesmo carro repostado no mesmo site vira chips "2", "3", não botões repetidos
+    const porSite = new Map();
+    c.links.forEach((l) => { if (!porSite.has(l.s)) porSite.set(l.s, []); porSite.get(l.s).push(l.u); });
+    porSite.forEach((urls, s) => {
+      const g = document.createElement('span'); g.className = 'site';
+      urls.forEach((u, i) => {
+        const a = document.createElement('a');
+        a.href = u; a.target = '_blank'; a.rel = 'noopener nofollow';
+        if (i === 0) { a.textContent = s; a.setAttribute('aria-label', `Abrir o anúncio no ${s} (nova aba)`); }
+        else { a.className = 'outro'; a.textContent = i + 1; a.setAttribute('aria-label', `Abrir o anúncio ${i + 1} no ${s} (nova aba)`); }
+        g.append(a);
+      });
+      sites.append(g);
+    });
+    return li;
+  }
+  // "preço bem abaixo da média" é alerta: o carimbo não pode elogiar o mesmo carro
+  const suspeito = (c) => c.al.some((a) => a.k === 'risco' && /abaixo da m/i.test(a.t));
+  function esc(s) { return String(s).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])); }
+
+  let ultimoTotal = -1;
+  function desenhar() {
+    const lista = D.filter((c) => passa(c)).sort(ORDENS[F.ordem] || ORDENS.fipe);
+    const ol = $('#linhas');
+    ol.replaceChildren(...lista.map(linha));
+    $('#vazio').hidden = lista.length > 0;
+    const ct = $('#ct');
+    ct.textContent = lista.length; $('#ct2').textContent = lista.length;
+    if (ultimoTotal !== -1 && ultimoTotal !== lista.length) { ct.classList.remove('peneirou'); void ct.offsetWidth; ct.classList.add('peneirou'); }
+    ultimoTotal = lista.length;
+    contarChips();
+    gravarUrl();
+  }
+
+  // ── Chips com contagem: cada opção diz quantos carros sobrariam ──
+  const GRUPOS = {
+    ano: { el: '#f-ano', val: (c) => String(c.ano), ord: (a, b) => a - b },
+    uf: { el: '#f-uf', val: (c) => c.uf, ord: (a, b) => (a === 'Não informado') - (b === 'Não informado') || a.localeCompare(b) },
+    cor: { el: '#f-cor', val: (c) => c.cor, ord: null },
+    banco: { el: '#f-banco', val: (c) => c.banco, ord: null },
+  };
+  function montarChips() {
+    for (const [k, g] of Object.entries(GRUPOS)) {
+      const cont = {};
+      D.forEach((c) => { const v = g.val(c); cont[v] = (cont[v] || 0) + 1; });
+      let vals = Object.keys(cont);
+      vals = g.ord ? vals.sort(g.ord) : vals.sort((a, b) => cont[b] - cont[a]);
+      $(g.el).innerHTML = vals.map((v) => `<label><input type="checkbox" name="${k}" value="${esc(v)}"><span>${esc(v)} <small data-n></small></span></label>`).join('');
+    }
+  }
+  function contarChips() {
+    for (const [k, g] of Object.entries(GRUPOS)) {
+      const base = D.filter((c) => passa(c, k));
+      const cont = {};
+      base.forEach((c) => { const v = g.val(c); cont[v] = (cont[v] || 0) + 1; });
+      $(g.el).querySelectorAll('input').forEach((i) => { i.nextElementSibling.querySelector('[data-n]').textContent = cont[i.value] || 0; });
+    }
+  }
+
+  function sincronizarForm() {
+    const f = $('#peneira');
+    f.semLeilao.checked = F.semLeilao;
+    f.querySelectorAll('input[name=bl]').forEach((r) => (r.checked = r.value === F.bl));
+    for (const k of Object.keys(GRUPOS)) f.querySelectorAll(`input[name=${k}]`).forEach((i) => (i.checked = F[k].includes(i.value)));
+    $('#f-preco').value = F.preco; $('#f-km').value = F.km; $('#f-cid').value = F.cid; $('#ordem').value = F.ordem;
+    rotulosFaixa();
+  }
+  function rotulosFaixa() {
+    $('#f-preco-v').textContent = F.preco >= PADRAO.preco ? 'Qualquer preço' : reais(F.preco);
+    $('#f-km-v').textContent = F.km >= PADRAO.km ? 'Qualquer km' : milKm(F.km);
+  }
+
+  function lerForm() {
+    const f = $('#peneira');
+    F.semLeilao = f.semLeilao.checked;
+    F.bl = f.querySelector('input[name=bl]:checked').value;
+    for (const k of Object.keys(GRUPOS)) F[k] = [...f.querySelectorAll(`input[name=${k}]:checked`)].map((i) => i.value);
+    F.preco = +$('#f-preco').value; F.km = +$('#f-km').value; F.cid = $('#f-cid').value.trim();
+    rotulosFaixa();
+    desenhar();
+  }
+
+  function pepitas() {
+    const top = D.filter((c) => !c.leilao && !c.bl && c.dif != null && c.capa && !c.al.some((a) => a.k === 'risco'))
+      .sort(ORDENS.fipe).slice(0, 3);
+    $('#pepitas').innerHTML = top.map((c) => `
+      <li class="pepita-item"><a href="#${c.id}" data-alvo="${c.id}">
+        <img src="img/${c.id}.jpg" alt="" width="64" height="48">
+        <span><b>C 300 ${c.ano} · ${esc(c.cor)}</b><small>${c.km ? milKm(c.km) + ' · ' : ''}${esc(c.cid || c.uf)}${c.cid ? '/' + c.uf : ''}</small></span>
+        <span class="pp">${reais(c.preco)}<em class="carimbo abaixo">${sobreFipe(c.dif)}% abaixo da FIPE</em></span>
+      </a></li>`).join('');
+  }
+
+  function irPara(id) {
+    let el = document.getElementById(id);
+    if (!el) { F = { ...PADRAO }; sincronizarForm(); desenhar(); el = document.getElementById(id); }
+    if (!el) return;
+    el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+    el.classList.add('alvo'); setTimeout(() => el.classList.remove('alvo'), 2200);
+  }
+
+  // ── Gaveta da peneira no celular ──
+  function gaveta(abrir) {
+    const pen = $('#peneira');
+    if (abrir) { pen.setAttribute('role', 'dialog'); pen.setAttribute('aria-modal', 'true'); }
+    else { pen.removeAttribute('role'); pen.removeAttribute('aria-modal'); }
+    ['header.placa', '#livro', 'footer.rodape'].forEach((s) => { const el = $(s); if (el) el.inert = abrir; });
+    pen.classList.toggle('aberta', abrir);
+    document.body.classList.toggle('peneira-aberta', abrir);
+    $('#abre-peneira').setAttribute('aria-expanded', abrir);
+    if (abrir) $('#peneira').querySelector('input').focus({ preventScroll: true }); else $('#abre-peneira').focus({ preventScroll: true });
+  }
+
+  async function iniciar() {
+    let pacote;
+    try {
+      const r = await fetch('dados.json', { cache: 'no-cache' });
+      if (!r.ok) throw new Error(r.status);
+      pacote = await r.json();
+    } catch (e) {
+      $('#linhas').innerHTML = '<li class="vazio"><p class="vazio-t">Não deu para carregar a lista.</p><p>Verifique a internet e recarregue a página.</p></li>';
+      return;
+    }
+    D = pacote.carros; ULT = pacote.atualizado;
+    $('#h-total').textContent = D.length;
+    document.querySelector('.ct-de').textContent = D.length;
+    $('#h-data').textContent = new Date(ULT + 'T12:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+    $('#r-fipe').textContent = `código ${pacote.fipe.codigo} (${pacote.fipe.modelo}), referência de ${pacote.fipe.mes}`;
+    $('#tabela-fipe tbody').innerHTML = Object.entries(pacote.fipe.anos).filter(([a]) => D.some((c) => String(c.ano) === a))
+      .map(([a, v]) => `<tr><td>${a}</td><td>${reais(v)}</td></tr>`).join('');
+
+    montarChips(); pepitas(); lerUrl(); sincronizarForm(); desenhar();
+
+    $('#peneira').addEventListener('input', (e) => { if (e.target.id !== 'f-cid') lerForm(); });
+    let t; $('#f-cid').addEventListener('input', () => { clearTimeout(t); t = setTimeout(lerForm, 180); });
+    $('#ordem').addEventListener('change', (e) => { F.ordem = e.target.value; desenhar(); });
+    const limpar = () => { F = { ...PADRAO, ordem: F.ordem }; sincronizarForm(); desenhar(); };
+    $('#limpa').addEventListener('click', limpar); $('#limpa2').addEventListener('click', limpar);
+    $('#abre-peneira').addEventListener('click', () => gaveta(true));
+    $('#fecha-peneira').addEventListener('click', () => gaveta(false));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#peneira').classList.contains('aberta')) gaveta(false); });
+    document.body.addEventListener('click', (e) => { if (document.body.classList.contains('peneira-aberta') && !e.target.closest('#peneira, #abre-peneira')) gaveta(false); });
+    $('#pepitas').addEventListener('click', (e) => { const a = e.target.closest('[data-alvo]'); if (a) { e.preventDefault(); irPara(a.dataset.alvo); } });
+  }
+  iniciar();
+})();
