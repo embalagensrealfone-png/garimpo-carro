@@ -113,6 +113,12 @@ Cantos de placa: 3px. O carimbo é um retângulo com borda dupla, girado -2°.
   dia; depois disso o botão vira "Minas ✓" e só reabre o resultado do dia. Um ponto vermelho no botão
   avisa que a mina mudou desde a última visita. No cartão do carro, o selo "Baixou R$ X" aparece por
   30 dias.
+- **Filtros rápidos** (celular e tablet, 24/11/2026): fileira que desliza embaixo da barra preta:
+  Perto de mim, Até R$ 300 mil, 2024 ou mais, Até 30 mil km, Único dono, Baixou de preço, Novos. Ligado
+  fica ouro com ×. "Perto de mim" usa a localização do aparelho só no navegador: pega a capital mais
+  próxima e as que estão a até 500 km. O botão Peneira mostra quantos filtros estão ligados.
+- **Peneira**: preço e km de/até, novidades, vendedor (único dono, garantia) e site do anúncio, além de
+  ano, estado, cor, banco e cidade. No celular, o cartão do carro é compacto (cerca de 280 px).
 - **Botão de anúncio**: placa preta com letra ouro, um por site; reposts no mesmo site viram
   chips numerados (2, 3) em papel.
 

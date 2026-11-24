@@ -8,7 +8,8 @@
   const dataBR = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
 
   let D = [], ULT = '';
-  const PADRAO = { semLeilao: true, bl: 'todos', ano: [], uf: [], cor: [], banco: [], preco: 460000, km: 80000, cid: '', ordem: 'fipe' };
+  const PADRAO = { semLeilao: true, bl: 'todos', ano: [], uf: [], cor: [], banco: [], site: [], nov: [], vend: [], pmin: 0, pmax: 0, kmin: 0, kmax: 0, cid: '', ordem: 'fipe' };
+  const LISTAS = ['ano', 'uf', 'cor', 'banco', 'site', 'nov', 'vend'];
   let F = { ...PADRAO };
 
   // ── Estado na URL: quem compartilha o link manda a peneira junto ──
@@ -19,9 +20,10 @@
       ...PADRAO,
       semLeilao: p.get('leilao') !== '1',
       bl: p.get('bl') || 'todos',
-      ano: lista('ano'), uf: lista('uf'), cor: lista('cor'), banco: lista('banco'),
-      preco: +p.get('preco') || PADRAO.preco,
-      km: +p.get('km') || PADRAO.km,
+      ...Object.fromEntries(LISTAS.map((k) => [k, lista(k)])),
+      // 'preco' e 'km' são o máximo (links antigos e a busca da página inicial usam esses nomes)
+      pmin: +p.get('pmin') || 0, pmax: +p.get('preco') || 0,
+      kmin: +p.get('kmin') || 0, kmax: +p.get('km') || 0,
       cid: p.get('cid') || '',
       ordem: p.get('ordem') || 'fipe',
     };
@@ -30,9 +32,11 @@
     const p = new URLSearchParams();
     if (!F.semLeilao) p.set('leilao', '1');
     if (F.bl !== 'todos') p.set('bl', F.bl);
-    for (const k of ['ano', 'uf', 'cor', 'banco']) if (F[k].length) p.set(k, F[k].join(','));
-    if (F.preco < PADRAO.preco) p.set('preco', F.preco);
-    if (F.km < PADRAO.km) p.set('km', F.km);
+    for (const k of LISTAS) if (F[k].length) p.set(k, F[k].join(','));
+    if (F.pmin) p.set('pmin', F.pmin);
+    if (F.pmax) p.set('preco', F.pmax);
+    if (F.kmin) p.set('kmin', F.kmin);
+    if (F.kmax) p.set('km', F.kmax);
     if (F.cid) p.set('cid', F.cid);
     if (F.ordem !== 'fipe') p.set('ordem', F.ordem);
     const h = p.toString();
@@ -44,13 +48,13 @@
     if (F.semLeilao && c.leilao) return false;
     if (F.bl === 'nao' && c.bl) return false;
     if (F.bl === 'sim' && !c.bl) return false;
-    if (ignorar !== 'ano' && F.ano.length && !F.ano.includes(String(c.ano))) return false;
-    if (ignorar !== 'uf' && F.uf.length && !F.uf.includes(c.uf)) return false;
-    if (ignorar !== 'cor' && F.cor.length && !F.cor.includes(c.cor)) return false;
-    if (ignorar !== 'banco' && F.banco.length && !F.banco.includes(c.banco)) return false;
-    // preço não informado não é "barato": só entra quando a peneira de preço está aberta
-    if (F.preco < PADRAO.preco && !(c.preco > 0 && c.preco <= F.preco)) return false;
-    if (F.km < PADRAO.km && !(c.km > 0 && c.km <= F.km)) return false;
+    // dentro de cada grupo de chips vale "qualquer um destes"; entre grupos, todos juntos
+    for (const [k, g] of Object.entries(GRUPOS)) {
+      if (k !== ignorar && F[k].length && ![].concat(g.val(c)).some((v) => F[k].includes(v))) return false;
+    }
+    // preço/km não informado não é "barato": só entra quando a peneira dele está aberta
+    if ((F.pmin || F.pmax) && !(c.preco > 0 && c.preco >= F.pmin && (!F.pmax || c.preco <= F.pmax))) return false;
+    if ((F.kmin || F.kmax) && !(c.km > 0 && c.km >= F.kmin && (!F.kmax || c.km <= F.kmax))) return false;
     if (F.cid && !semAcento(c.cid).includes(semAcento(F.cid))) return false;
     return true;
   }
@@ -91,7 +95,7 @@
     const fab = c.fab && c.fab !== String(c.ano) ? `${c.fab}/${c.ano}` : String(c.ano);
     $('.titulo', li).innerHTML = `C 300 ${fab} · ${esc(c.cor)} <small>banco ${esc(c.banco.toLowerCase())}</small>`;
     const onde = c.cid ? `${esc(c.cid)}${c.uf && c.uf !== 'Não informado' ? '/' + c.uf : ''}` : (c.uf !== 'Não informado' ? c.uf : 'Cidade não informada');
-    $('.meta', li).innerHTML = [c.km ? `<b>${milKm(c.km)}</b> ${textoKm(c)}` : 'km não informado', onde, `na lista desde ${dataBR(c.dt)}`].join(' · ');
+    $('.meta', li).innerHTML = [c.km ? `<b>${milKm(c.km)}</b> ${textoKm(c)}` : 'km não informado', onde].join(' · ') + `<span class="desde"> · na lista desde ${dataBR(c.dt)}</span>`;
 
     const al = $('.alertas', li);
     // risco primeiro: do lado do comprador
@@ -170,6 +174,7 @@
     if (ultimoTotal !== -1 && ultimoTotal !== lista.length) { ct.classList.remove('peneirou'); void ct.offsetWidth; ct.classList.add('peneirou'); }
     ultimoTotal = lista.length;
     contarChips();
+    marcarRapidos(); marcarPerto();
     gravarUrl();
   }
 
@@ -179,21 +184,38 @@
     uf: { el: '#f-uf', val: (c) => c.uf, ord: (a, b) => (a === 'Não informado') - (b === 'Não informado') || a.localeCompare(b) },
     cor: { el: '#f-cor', val: (c) => c.cor, ord: null },
     banco: { el: '#f-banco', val: (c) => c.banco, ord: null },
+    site: { el: '#f-site', val: (c) => [...new Set(c.links.map((l) => l.s))], ord: null },
+    nov: { el: '#f-nov', val: novidades, ord: (a, b) => a.localeCompare(b) * -1, rot: { novo: 'Novos na última conferida', baixou: 'Baixou de preço' } },
+    vend: { el: '#f-vend', val: vendedor, ord: null, rot: { dono: 'Único dono', garantia: 'Com garantia' } },
   };
+  function novidades(c) {
+    const t = [];
+    if (c.dt === ULT) t.push('novo');                 // mesmo critério do selo "Novo · dd/mm"
+
+    if (baixouRecente(c)) t.push('baixou');
+    return t;
+  }
+  function vendedor(c) {
+    const t = [], txt = c.al.map((a) => a.t).join(' ');
+    if (/único dono/i.test(txt)) t.push('dono');
+    if (/garantia/i.test(txt)) t.push('garantia');
+    return t;
+  }
   function montarChips() {
     for (const [k, g] of Object.entries(GRUPOS)) {
       const cont = {};
-      D.forEach((c) => { const v = g.val(c); cont[v] = (cont[v] || 0) + 1; });
+      D.forEach((c) => [].concat(g.val(c)).forEach((v) => { cont[v] = (cont[v] || 0) + 1; }));
       let vals = Object.keys(cont);
       vals = g.ord ? vals.sort(g.ord) : vals.sort((a, b) => cont[b] - cont[a]);
-      $(g.el).innerHTML = vals.map((v) => `<label><input type="checkbox" name="${k}" value="${esc(v)}"><span>${esc(v)} <small data-n></small></span></label>`).join('');
+      $(g.el).innerHTML = vals.map((v) => `<label><input type="checkbox" name="${k}" value="${esc(v)}"><span>${esc(g.rot ? g.rot[v] : v)} <small data-n></small></span></label>`).join('');
+      $(g.el).closest('fieldset').hidden = !vals.length;
     }
   }
   function contarChips() {
     for (const [k, g] of Object.entries(GRUPOS)) {
       const base = D.filter((c) => passa(c, k));
       const cont = {};
-      base.forEach((c) => { const v = g.val(c); cont[v] = (cont[v] || 0) + 1; });
+      base.forEach((c) => [].concat(g.val(c)).forEach((v) => { cont[v] = (cont[v] || 0) + 1; }));
       $(g.el).querySelectorAll('input').forEach((i) => { i.nextElementSibling.querySelector('[data-n]').textContent = cont[i.value] || 0; });
     }
   }
@@ -203,12 +225,92 @@
     f.semLeilao.checked = F.semLeilao;
     f.querySelectorAll('input[name=bl]').forEach((r) => (r.checked = r.value === F.bl));
     for (const k of Object.keys(GRUPOS)) f.querySelectorAll(`input[name=${k}]`).forEach((i) => (i.checked = F[k].includes(i.value)));
-    $('#f-preco').value = F.preco; $('#f-km').value = F.km; $('#f-cid').value = F.cid; $('#ordem').value = F.ordem;
-    rotulosFaixa();
+    for (const k of ['pmin', 'pmax', 'kmin', 'kmax']) faixaValor($('#f-' + k), F[k]);
+    $('#f-cid').value = F.cid; $('#ordem').value = F.ordem;
   }
-  function rotulosFaixa() {
-    $('#f-preco-v').textContent = F.preco >= PADRAO.preco ? 'Qualquer preço' : reais(F.preco);
-    $('#f-km-v').textContent = F.km >= PADRAO.km ? 'Qualquer km' : milKm(F.km);
+  // valor que veio de link e não está na lista de opções (ex.: 255.000) ganha opção própria
+  function faixaValor(sel, v) {
+    if (v && ![...sel.options].some((o) => +o.value === v)) {
+      const ehPreco = /p(min|max)/.test(sel.id);
+      sel.add(new Option(ehPreco ? reais(v) : milKm(v), v));
+      [...sel.options].slice(1).sort((a, b) => a.value - b.value).forEach((o) => sel.add(o));
+    }
+    sel.value = v || '';
+  }
+  function montarFaixas() {
+    const passo = (lo, hi, p) => { const r = []; for (let v = Math.ceil(lo / p) * p; v <= hi; v += p) r.push(v); return r; };
+    const precos = D.map((c) => c.preco).filter(Boolean), kms = D.map((c) => c.km).filter(Boolean);
+    const P = passo(Math.min(...precos), Math.max(...precos) + 10000, 10000), K = passo(0, Math.max(...kms) + 5000, 5000).filter((v) => v);
+    const encher = (id, vals, fmt, vazio) => { const s = $(id); s.innerHTML = ''; s.add(new Option(vazio, '')); vals.forEach((v) => s.add(new Option(fmt(v), v))); };
+    encher('#f-pmin', P, reais, 'de qualquer'); encher('#f-pmax', P, reais, 'até qualquer');
+    encher('#f-kmin', K, milKm, 'de 0 km'); encher('#f-kmax', K, milKm, 'até qualquer');
+  }
+
+  // ── Filtros rápidos: um toque liga, outro desliga; o estado sai sempre de F (mesmo da peneira) ──
+  const iguais = (a, b) => a.length === b.length && a.every((v) => b.includes(v));
+  const alterna = (k, v) => { F[k] = F[k].includes(v) ? F[k].filter((x) => x !== v) : [...F[k], v]; };
+  let PERTO = null; try { PERTO = JSON.parse(sessionStorage.getItem('gc-perto')); } catch (e) { /* sem acesso */ }
+  const RAPIDOS = [
+    { id: 'perto', rot: () => (PERTO ? `Perto de mim · ${PERTO.join(', ')}` : 'Perto de mim'), on: () => PERTO && iguais(F.uf, PERTO),
+      toca: () => { if (PERTO && iguais(F.uf, PERTO)) F.uf = []; else return pertoDeMim(); } },
+    { id: 'p300', rot: () => 'Até R$ 300 mil', on: () => F.pmax === 300000 && !F.pmin, toca: () => { if (F.pmax === 300000 && !F.pmin) F.pmax = 0; else { F.pmax = 300000; F.pmin = 0; } } },
+    { id: 'a24', rot: () => '2024 ou mais', on: () => F.ano.length && iguais(F.ano, anosDesde(2024)), toca: () => { F.ano = iguais(F.ano, anosDesde(2024)) ? [] : anosDesde(2024); } },
+    { id: 'km30', rot: () => 'Até 30 mil km', on: () => F.kmax === 30000 && !F.kmin, toca: () => { if (F.kmax === 30000 && !F.kmin) F.kmax = 0; else { F.kmax = 30000; F.kmin = 0; } } },
+    { id: 'dono', rot: () => 'Único dono', on: () => F.vend.includes('dono'), toca: () => alterna('vend', 'dono') },
+    { id: 'baixou', rot: () => 'Baixou de preço', on: () => F.nov.includes('baixou'), toca: () => alterna('nov', 'baixou') },
+    { id: 'novo', rot: () => 'Novos', on: () => F.nov.includes('novo'), toca: () => alterna('nov', 'novo') },
+  ];
+  const anosDesde = (a) => [...new Set(D.map((c) => c.ano).filter((x) => x >= a))].sort().map(String);
+  function montarRapidos() {
+    $('#rapidos').innerHTML = RAPIDOS.map((r) => `<button type="button" data-r="${r.id}" aria-pressed="false">${r.id === 'perto' ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="12" cy="9.5" r="2.4" fill="currentColor"/></svg>' : ''}<span></span></button>`).join('');
+    $('#rapidos').addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-r]'); if (!b) return;
+      const r = RAPIDOS.find((x) => x.id === b.dataset.r);
+      await r.toca(); sincronizarForm(); desenhar();
+    });
+  }
+  function marcarRapidos() {
+    $('#rapidos').querySelectorAll('[data-r]').forEach((b) => {
+      const r = RAPIDOS.find((x) => x.id === b.dataset.r);
+      b.setAttribute('aria-pressed', r.on() ? 'true' : 'false');
+      $('span', b).textContent = r.rot();
+    });
+    // quantos filtros estão ligados, no botão da peneira (celular)
+    const n = LISTAS.reduce((s, k) => s + (F[k].length ? 1 : 0), 0) + (F.pmin || F.pmax ? 1 : 0) + (F.kmin || F.kmax ? 1 : 0)
+      + (F.cid ? 1 : 0) + (F.bl !== 'todos' ? 1 : 0) + (F.semLeilao ? 0 : 1);
+    const pn = $('#pen-n'); pn.hidden = !n; pn.textContent = n;
+    $('#abre-peneira').setAttribute('aria-label', n ? `Peneira, ${n} filtro${n > 1 ? 's' : ''} ligado${n > 1 ? 's' : ''}` : 'Peneira');
+  }
+
+  // ── Perto de mim: a localização fica no aparelho. Achamos a capital mais próxima e as que estão a
+  // até 500 km dela, sem mandar a posição para nenhum serviço de fora ──
+  const CAPITAIS = { AC: [-9.97, -67.81], AL: [-9.67, -35.74], AP: [0.03, -51.07], AM: [-3.12, -60.02], BA: [-12.97, -38.5], CE: [-3.73, -38.53],
+    DF: [-15.79, -47.88], ES: [-20.32, -40.34], GO: [-16.69, -49.26], MA: [-2.53, -44.3], MT: [-15.6, -56.1], MS: [-20.47, -54.62], MG: [-19.92, -43.94],
+    PA: [-1.46, -48.49], PB: [-7.12, -34.86], PR: [-25.43, -49.27], PE: [-8.05, -34.9], PI: [-5.09, -42.8], RJ: [-22.91, -43.17], RN: [-5.79, -35.21],
+    RS: [-30.03, -51.23], RO: [-8.76, -63.9], RR: [2.82, -60.67], SC: [-27.6, -48.55], SP: [-23.55, -46.63], SE: [-10.91, -37.07], TO: [-10.18, -48.33] };
+  function km(a, b) {
+    const r = Math.PI / 180, dLa = (b[0] - a[0]) * r, dLo = (b[1] - a[1]) * r;
+    const h = Math.sin(dLa / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLo / 2) ** 2;
+    return 12742 * Math.asin(Math.sqrt(h));
+  }
+  function pertoDeMim() {
+    const b = $('#rapidos [data-r=perto] span'), bp = $('#f-perto');
+    const aviso = (t) => { [b, bp].forEach((el) => el && (el.textContent = t)); setTimeout(() => { marcarRapidos(); marcarPerto(); }, 2600); };
+    if (!navigator.geolocation) { aviso('Sem localização neste aparelho'); return Promise.resolve(); }
+    [b, bp].forEach((el) => el && (el.textContent = 'Procurando você…'));
+    return new Promise((ok) => navigator.geolocation.getCurrentPosition((pos) => {
+      const eu = [pos.coords.latitude, pos.coords.longitude];
+      const dist = Object.entries(CAPITAIS).map(([uf, c]) => [uf, km(eu, c)]).sort((x, y) => x[1] - y[1]);
+      PERTO = dist.filter(([, d], i) => i === 0 || d <= 500).map(([uf]) => uf);
+      try { sessionStorage.setItem('gc-perto', JSON.stringify(PERTO)); } catch (e) { /* aba anônima */ }
+      F.uf = PERTO.slice(); ok();
+    }, (err) => { aviso(err.code === 1 ? 'Localização bloqueada' : 'Não achei sua localização'); ok(); }, { timeout: 12000, maximumAge: 600000 }));
+  }
+  function marcarPerto() {
+    const bp = $('#f-perto'); if (!bp) return;
+    const on = PERTO && iguais(F.uf, PERTO);
+    bp.setAttribute('aria-pressed', on ? 'true' : 'false');
+    bp.textContent = PERTO ? `Perto de mim · ${PERTO.join(', ')}` : 'Perto de mim';
   }
 
   function lerForm() {
@@ -216,8 +318,8 @@
     F.semLeilao = f.semLeilao.checked;
     F.bl = f.querySelector('input[name=bl]:checked').value;
     for (const k of Object.keys(GRUPOS)) F[k] = [...f.querySelectorAll(`input[name=${k}]:checked`)].map((i) => i.value);
-    F.preco = +$('#f-preco').value; F.km = +$('#f-km').value; F.cid = $('#f-cid').value.trim();
-    rotulosFaixa();
+    for (const k of ['pmin', 'pmax', 'kmin', 'kmax']) F[k] = +$('#f-' + k).value || 0;
+    F.cid = $('#f-cid').value.trim();
     desenhar();
   }
 
@@ -371,7 +473,7 @@
 
     // link de um carro só (#carro=id): lido antes de lerUrl, porque gravarUrl reescreve o endereço
     const carroAlvo = new URLSearchParams(location.hash.slice(1)).get('carro');
-    montarChips(); pepitas(); lerUrl(); sincronizarForm(); desenhar();
+    montarChips(); montarFaixas(); montarRapidos(); pepitas(); lerUrl(); sincronizarForm(); desenhar();
     if (carroAlvo) document.fonts.ready.then(() => setTimeout(() => irPara(carroAlvo, true), 60));
     $('#linhas').addEventListener('click', (e) => { const b = e.target.closest('.compartilha'); if (b) compartilhar(b); });
 
@@ -381,6 +483,10 @@
     const limpar = () => { F = { ...PADRAO, ordem: F.ordem }; sincronizarForm(); desenhar(); };
     $('#limpa').addEventListener('click', limpar); $('#limpa2').addEventListener('click', limpar);
     $('#abre-peneira').addEventListener('click', () => gaveta(true));
+    $('#f-perto').addEventListener('click', async () => {
+      if (PERTO && iguais(F.uf, PERTO)) F.uf = []; else await pertoDeMim();
+      sincronizarForm(); desenhar();
+    });
     $('#fecha-peneira').addEventListener('click', () => gaveta(false));
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#peneira').classList.contains('aberta')) gaveta(false); });
     document.body.addEventListener('click', (e) => { if (document.body.classList.contains('peneira-aberta') && !e.target.closest('#peneira, #abre-peneira')) gaveta(false); });

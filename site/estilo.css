@@ -578,3 +578,95 @@ a.modelo:hover .modelo-ir span { display: inline-block; transform: translateX(4p
   .busca-grade > .campo, .busca-grade > .campo-par { grid-column: span 3; }
 }
 @media (max-width: 560px) { .busca-grade > .campo, .busca-grade > .campo-par { grid-column: span 6; } }
+
+/* ── Lista no celular (24/11/2026): filtros rápidos, peneira com variações, cartão compacto ── */
+.pen-n { display: inline-grid; place-items: center; min-width: 20px; height: 20px; margin-left: 7px; padding: 0 5px;
+  border-radius: 10px; background: var(--tinta); color: var(--ouro); font: 700 .8rem/1 var(--rotulo); letter-spacing: 0; vertical-align: 1px; }
+.pen-n[hidden] { display: none; }
+.ordem-ico { display: none; }
+.rapidos { display: none; }
+.de-ate { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; }
+.de-ate span { color: var(--tinta-2); font-size: .9rem; }
+.de-ate select {
+  width: 100%; min-width: 0; height: 40px; padding: 0 8px; background: var(--papel);
+  border: 1.5px solid var(--tinta); border-radius: var(--placa); font: 600 .95rem/1 var(--rotulo);
+}
+.perto {
+  display: inline-flex; align-items: center; gap: 6px; margin: 0 0 10px; min-height: 36px; padding: 6px 12px;
+  background: var(--ouro); color: var(--tinta); border: 1.5px solid var(--tinta); border-radius: var(--placa);
+  font: 700 .95rem/1 var(--rotulo); letter-spacing: .03em; cursor: pointer;
+}
+.perto::before { content: '◎'; font-family: var(--corpo); }
+.perto[aria-pressed="true"] { background: var(--tinta); color: var(--ouro); }
+
+@media (max-width: 900px) {
+  .barra-peneira { flex-wrap: wrap; row-gap: 8px; }
+  .rapidos {
+    display: flex; gap: 6px; flex: 0 0 calc(100% + 2 * clamp(16px, 4vw, 48px));
+    margin: 0 calc(-1 * clamp(16px, 4vw, 48px)); padding: 0 clamp(16px, 4vw, 48px) 2px;
+    overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain;
+  }
+  .rapidos::-webkit-scrollbar { display: none; }
+  .rapidos button {
+    flex: none; display: inline-flex; align-items: center; gap: 5px; height: 34px; padding: 0 12px; cursor: pointer;
+    background: transparent; color: #E9E4D8; border: 1.5px solid #6B6356; border-radius: 17px;
+    font: 600 .92rem/1 var(--rotulo); letter-spacing: .03em; white-space: nowrap;
+  }
+  .rapidos button svg { width: 15px; height: 15px; }
+  .rapidos button[aria-pressed="true"] { background: var(--ouro); color: var(--tinta); border-color: var(--ouro); }
+  .rapidos button[aria-pressed="true"]::after { content: '×'; font: 700 1.05rem/1 var(--corpo); margin-left: 2px; }
+  .linha { scroll-margin-top: 120px; }
+  .peneira { padding-left: 16px; padding-right: 16px; }
+  .peneira-topo { gap: 12px; }
+}
+@media (max-width: 560px) {
+  /* barra: Peneira (com nº de filtros) · contador · Minas · ícone de ordem, tudo numa linha */
+  .barra-peneira { gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+  .contador { margin-right: auto; }
+  .contador strong { font-size: 1.4rem; min-width: 0; }
+  .ordem { position: relative; width: 40px; height: 38px; flex: none; }
+  .ordem-ico { display: block; width: 40px; height: 38px; padding: 8px; color: var(--ouro); border: 1.5px solid #6B6356; border-radius: var(--placa); }
+  .ordem select { position: absolute; inset: 0; width: 100%; max-width: none; height: 100%; opacity: 0; cursor: pointer; }
+
+  /* cartão compacto: foto e dados lado a lado; preço e % na mesma linha; botões logo embaixo */
+  .linhas { gap: 10px; }
+  .linha { grid-template-columns: 104px minmax(0, 1fr); gap: 8px 12px; padding: 10px; }
+  .foto { align-self: start; }
+  .selos { margin-bottom: 4px; gap: 4px; }
+  .selo { font-size: .7rem; padding: 3px 5px; }
+  .titulo { font-size: 1.12rem; }
+  .titulo small { font-size: .88rem; }
+  .meta { margin-top: 3px; font-size: .86rem; line-height: 1.35; }
+  .meta .desde { display: none; }
+  .kmrel { display: inline; margin: 0 0 0 2px; padding: 1px 4px; font-size: .76rem; white-space: normal; }
+  .alertas { margin-top: 5px; gap: 2px; font-size: .8rem; line-height: 1.25; }
+  .alertas li:nth-child(n+3) { display: none; }
+  .valor {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "preco carimbo" "fipe comp" "sites sites";
+    align-items: center; gap: 6px 10px; padding-top: 8px;
+  }
+  .valor .preco { grid-area: preco; font-size: 1.3rem; padding: 10px 18px 6px; }
+  .valor .preco.sem { font-size: 1rem; padding: 0; }
+  .valor .carimbo { grid-area: carimbo; justify-self: start; font-size: .72rem; padding: 4px 6px 3px; }
+  .valor .fipe-ref { grid-area: fipe; font-size: .82rem; margin: 0; }
+  .valor .fipe-ref b { font-size: .92rem; }
+  .valor .compartilha { grid-area: comp; justify-self: end; font-size: .8rem; }
+  .valor .sites { grid-area: sites; gap: 5px; }
+  .sites a { flex: 0 1 auto; min-height: 34px; padding: 7px 10px; font-size: .84rem; }
+}
+@media (max-width: 560px) {
+  /* página inicial: placas mais baixas, para o cartão da C 300 já aparecer na primeira tela */
+  .placa-inicio { padding-bottom: 28px; }
+  .inicio-corpo { margin-top: 18px; gap: 20px; }
+  .banner { min-height: 0; gap: 12px; padding: 18px 18px 20px; }
+  .banner-dor { font-size: 1.5rem; }
+  .banner span { margin-bottom: 5px; font-size: .74rem; }
+  .banner-sol { font-size: .94rem; line-height: 1.4; padding-left: 12px; }
+  .banner-num { font-size: .88rem; padding: 6px 10px 5px; }
+  .banner-num b { font-size: 1.15rem; }
+  .vitrine-controle { margin-top: 8px; }
+  .vitrine-seta { width: 40px; height: 40px; }
+  .procura { gap: 12px; }
+  .procura-t { font-size: 1.45rem; }
+  .modelo img { height: 170px; }
+}

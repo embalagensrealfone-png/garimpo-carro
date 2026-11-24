@@ -148,6 +148,7 @@
       const lista = [2022, 2023, 2024, 2025].filter((a) => (!a1 || a >= a1) && (!a2 || a <= a2));
       if (lista.length && lista.length < 4) q.set('ano', lista.join(','));
       if (ufs.length) q.set('uf', ufs.join(','));
+      if (p1) q.set('pmin', p1);
       if (p2) q.set('preco', p2);
       location.href = 'c300.html' + (q.toString() ? '#' + q : '');
       return;

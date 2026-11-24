@@ -63,14 +63,15 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
 </header>
 
 <div class="barra-peneira" id="barra">
-  <button class="abre-peneira" id="abre-peneira" type="button" aria-controls="peneira" aria-expanded="false">Peneira</button>
+  <button class="abre-peneira" id="abre-peneira" type="button" aria-controls="peneira" aria-expanded="false">Peneira<span class="pen-n" id="pen-n" hidden></span></button>
   <p class="contador" aria-live="polite"><span class="ct-de">186</span> <span class="ct-seta" aria-hidden="true">→</span> <strong id="ct">186</strong> <span class="ct-rot">na peneira</span></p>
   <button type="button" class="minas-btn" id="minas-btn" aria-haspopup="dialog" aria-controls="minas">
     <svg viewBox="0 0 24 24" aria-hidden="true"><g transform="translate(12,11.5) scale(.19) rotate(-38)" fill="currentColor"><rect x="-6" y="-14" width="12" height="62" rx="6"/><path d="M-46 8 C-32 -22 32 -22 46 8 L40 11 C26 -6 -26 -6 -40 11 Z"/><rect x="-9.5" y="-20" width="19" height="17" rx="3.5"/></g></svg>
     <span id="minas-rot">Minas</span><i class="minas-ponto" id="minas-ponto" hidden></i>
   </button>
-  <label class="ordem">
+  <label class="ordem" title="Ordenar a lista">
     <span>Ordem</span>
+    <svg class="ordem-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v14M3 14l4 4 4-4M17 20V6M13 10l4-4 4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <select id="ordem">
       <option value="fipe">Mais abaixo da FIPE</option>
       <option value="recentes">Mais recentes</option>
@@ -79,6 +80,7 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
       <option value="ano">Mais novo</option>
     </select>
   </label>
+  <div class="rapidos" id="rapidos" role="group" aria-label="Filtros rápidos"></div>
 </div>
 
 <main class="garimpo">
@@ -104,23 +106,32 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
     </fieldset>
 
     <fieldset>
-      <legend>Preço até</legend>
-      <div class="faixa">
-        <input type="range" id="f-preco" name="preco" min="240000" max="460000" step="5000" aria-describedby="f-preco-v">
-        <output id="f-preco-v"></output>
+      <legend>Preço</legend>
+      <div class="de-ate">
+        <select id="f-pmin" aria-label="Preço mínimo"></select><span>a</span><select id="f-pmax" aria-label="Preço máximo"></select>
       </div>
     </fieldset>
 
     <fieldset>
-      <legend>Quilometragem até</legend>
-      <div class="faixa">
-        <input type="range" id="f-km" name="km" min="0" max="80000" step="2500" aria-describedby="f-km-v">
-        <output id="f-km-v"></output>
+      <legend>Quilometragem</legend>
+      <div class="de-ate">
+        <select id="f-kmin" aria-label="Quilometragem mínima"></select><span>a</span><select id="f-kmax" aria-label="Quilometragem máxima"></select>
       </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Novidades</legend>
+      <div class="chips" id="f-nov"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Vendedor</legend>
+      <div class="chips" id="f-vend"></div>
     </fieldset>
 
     <fieldset>
       <legend>Estado</legend>
+      <button type="button" class="perto" id="f-perto">Perto de mim</button>
       <div class="chips" id="f-uf"></div>
     </fieldset>
 
@@ -132,6 +143,11 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
     <fieldset>
       <legend>Banco</legend>
       <div class="chips" id="f-banco"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Site do anúncio</legend>
+      <div class="chips" id="f-site"></div>
     </fieldset>
 
     <fieldset>
