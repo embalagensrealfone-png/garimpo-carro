@@ -102,7 +102,7 @@ button, input, select { font: inherit; color: inherit; }
 .pepita-item img { width: 64px; height: 48px; object-fit: cover; border-radius: 2px; background: var(--cal); }
 .pepita-item b { display: block; font: 700 1.02rem/1.15 var(--rotulo); }
 .pepita-item small { display: block; color: var(--tinta-2); font-size: .85rem; }
-.pepita-item .pp { text-align: right; font: 700 1.15rem/1 var(--rotulo); font-variant-numeric: tabular-nums; }
+.pepita-item .pp { display: flex; flex-direction: column; align-items: flex-end; text-align: right; font: 700 1.15rem/1 var(--rotulo); font-variant-numeric: tabular-nums; }
 .pepita-item .pp .carimbo { display: inline-block; margin-top: 6px; font-style: normal; font-size: .74rem; padding: 3px 6px 2px; }
 .pepita-item a:hover b { text-decoration: underline; text-underline-offset: 3px; }
 
@@ -309,7 +309,7 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
   .titulo { font-size: 1.15rem; }
   .pepita-item a { grid-template-columns: 64px 1fr; row-gap: 4px; }
   .pepita-item img { grid-row: span 2; align-self: start; }
-  .pepita-item .pp { text-align: left; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .pepita-item .pp { text-align: left; flex-direction: row; align-items: center; gap: 10px; flex-wrap: wrap; }
   .pepita-item .pp .carimbo { margin-top: 0; }
   .titulo small { display: block; font-size: .95rem; }
   .meta { font-size: .88rem; }
