@@ -88,7 +88,7 @@
   }).catch(() => { /* sem dados, as placas ficam com o texto e o traço */ });
 
   // ── Pedido de garimpo: marca → modelo → versão saem da tabela FIPE (catalogo.json) ──
-  const WHATS = ''; // número da empresa com DDI e DDD, só dígitos (ex.: 5548999999999)
+  const WHATS = '5548991740811'; // número da empresa com DDI e DDD, só dígitos (ex.: 5548999999999)
   const UFS = 'AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO'.split(' ');
   const bm = $('#b-marca'), bmod = $('#b-modelo'), bv = $('#b-versao');
   const de = $('#b-ano-de'), ate = $('#b-ano-ate'), erro = $('#b-erro'), botao = $('#b-ir');
