@@ -65,6 +65,12 @@ carimba. Traduzido: os filtros são a **peneira**, cada carro é uma linha do **
 com um **carimbo** dizendo quanto está abaixo/acima da FIPE.
 Cena física: comprador olhando no celular, de dia ou à noite em casa — fundo claro, contraste alto.
 
+## Logo
+Escolhida em 23/11/2026 (opção P3): **picareta amarela num quadrado preto de cantos arredondados**
+(`marca/simbolo-escuro.svg`; versão invertida em `marca/simbolo-amarelo.svg`), ao lado da palavra
+**GARIMPO** (Barlow Condensed 800) com **CARRO** embaixo (500, espaçado 0,36em). O símbolo sozinho é
+o ícone do site e do app. Opções descartadas ficam em `marca/opcoes-*.png`.
+
 ## Colors
 Estratégia **Committed**: o ouro domina regiões inteiras (cabeçalho, abertura), nunca vira
 detalhe espalhado. O resto é cal (parede caiada) e papel.
@@ -72,7 +78,7 @@ detalhe espalhado. O resto é cal (parede caiada) e papel.
 - Texto secundário é `tinta-2`, nunca cinza puro.
 
 ## Typography
-- **Alfa Slab One** = letreiro. Só títulos e logo, com realce branco de pincel (`3px 3px 0` branco 60%) sobre o ouro. A segunda linha do letreiro vai em branco com contorno e sombra em tinta — a segunda cor de toda placa "Compro Ouro".
+- **Alfa Slab One** = letreiro. Só títulos (a logo usa Barlow Condensed), com realce branco de pincel (`3px 3px 0` branco 60%) sobre o ouro. A segunda linha do letreiro vai em branco com contorno e sombra em tinta — a segunda cor de toda placa "Compro Ouro".
 - **Barlow Condensed 700** = números (preço, km, %) e rótulos, com algarismos tabulares.
 - **Barlow** = texto corrido.
 

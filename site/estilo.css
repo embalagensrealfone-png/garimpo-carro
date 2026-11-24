@@ -56,13 +56,11 @@ button, input, select { font: inherit; color: inherit; }
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   max-width: 1320px; margin: 0 auto;
 }
-.marca {
-  display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
-  font: 400 1.35rem/0.92 var(--letreiro);
-  text-transform: uppercase; letter-spacing: .01em;
-  text-shadow: 2px 2px 0 rgba(255,255,255,.55);
-}
-.pepita { width: 44px; height: 37px; flex: none; }
+.marca { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--tinta); }
+.selo-marca { width: 52px; height: 52px; flex: none; }
+.palavra { display: grid; line-height: 1; text-transform: uppercase; }
+.palavra b { font: 800 1.85rem/0.9 var(--rotulo); letter-spacing: .02em; }
+.palavra span { font: 500 1.28rem/1 var(--rotulo); letter-spacing: .36em; margin-top: 3px; }
 .placa-mod { margin: 0; font: 600 .98rem/1.2 var(--rotulo); color: var(--tinta-ouro); letter-spacing: .02em; }
 .placa-mod strong { color: var(--tinta); font-weight: 700; }
 
@@ -274,7 +272,7 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
 .tabela-fipe caption { text-align: left; font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: #B9B2A4; padding-bottom: 8px; }
 .tabela-fipe th, .tabela-fipe td { padding: 7px 28px 7px 0; border-bottom: 1px solid #3A342A; text-align: left; }
 .tabela-fipe th { color: #B9B2A4; font-weight: 600; }
-.rodape-marca { max-width: 1320px; margin: 36px auto 0; padding-top: 18px; border-top: 1px solid #3A342A; font: 400 1rem/1 var(--letreiro); color: var(--ouro); }
+.rodape-marca { max-width: 1320px; margin: 36px auto 0; padding-top: 18px; border-top: 1px solid #3A342A; font: 700 1.05rem/1 var(--rotulo); letter-spacing: .08em; text-transform: uppercase; color: var(--ouro); }
 
 /* ── Telas menores ───────────────────────────────────── */
 @media (max-width: 1080px) {
