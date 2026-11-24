@@ -259,6 +259,13 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
 .sites a.outro::after { content: none; }
 .sites a:hover { transform: translate(-2px, -2px); box-shadow: 2px 2px 0 var(--ouro), 4px 4px 0 var(--tinta); }
 
+.compartilha {
+  align-self: flex-end; background: none; border: 0; padding: 4px 0; cursor: pointer;
+  font: 600 .9rem/1 var(--rotulo); letter-spacing: .04em; text-transform: uppercase; color: var(--tinta-2);
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px;
+}
+.compartilha::before { content: '⤴ '; text-decoration: none; display: inline-block; margin-right: 2px; }
+.compartilha:hover { color: var(--tinta); }
 .vazio { background: var(--papel); border: 2px dashed var(--tinta); border-radius: var(--placa); padding: 28px; }
 .vazio-t { margin: 0 0 8px; font: 400 1.5rem/1.1 var(--letreiro); }
 
@@ -278,6 +285,7 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
 @media (max-width: 1080px) {
   .linha { grid-template-columns: 150px minmax(0, 1fr); }
   .valor { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; text-align: left; flex-wrap: wrap; border-top: 1px solid var(--linha); padding-top: 10px; }
+  .compartilha { order: 9; align-self: center; }
   .sites { margin-top: 0; margin-left: auto; }
 }
 @media (max-width: 900px) {
@@ -303,6 +311,14 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
 }
 @media (max-width: 560px) {
   .placa-mod { width: 100%; }
+  .so-grande { display: none; }
+  .placa { padding-top: 22px; padding-bottom: 26px; }
+  .placa-corpo { margin-top: 16px; gap: 18px; }
+  .letreiro { font-size: 2rem; }
+  .placa-sub { margin-top: 10px; font-size: 1rem; }
+  .pepitas { padding: 12px 14px 2px; }
+  .pepitas-sub { display: none; }
+  .pepita-item a { padding: 8px 0; }
   .linha { grid-template-columns: 108px minmax(0, 1fr); gap: 12px; padding: 10px; }
   .titulo { font-size: 1.15rem; }
   .pepita-item a { grid-template-columns: 64px 1fr; row-gap: 4px; }

@@ -109,6 +109,8 @@
     else { ca.classList.add('na'); ca.innerHTML = `Na FIPE<small>FIPE ${c.ano}: ${reais(c.fipe)}</small>`; }
 
     const sites = $('.sites', li);
+    const comp = $('.compartilha', li); comp.dataset.id = c.id;
+    comp.setAttribute('aria-label', `Compartilhar a C 300 ${c.ano} ${c.cor.toLowerCase()} de ${c.cid || c.uf}`);
     // um botão por site; o mesmo carro repostado no mesmo site vira chips "2", "3", não botões repetidos
     const porSite = new Map();
     c.links.forEach((l) => { if (!porSite.has(l.s)) porSite.set(l.s, []); porSite.get(l.s).push(l.u); });
@@ -202,12 +204,31 @@
       </a></li>`).join('');
   }
 
-  function irPara(id) {
+  function irPara(id, chegando) {
     let el = document.getElementById(id);
     if (!el) { F = { ...PADRAO }; sincronizarForm(); desenhar(); el = document.getElementById(id); }
     if (!el) return;
-    el.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
-    el.classList.add('alvo'); setTimeout(() => el.classList.remove('alvo'), 2200);
+    // quem chega por link de um carro vai direto, sem animação: a página ainda está montando
+    const suave = !chegando && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'center' });
+    el.classList.add('alvo'); setTimeout(() => el.classList.remove('alvo'), chegando ? 4000 : 2200);
+  }
+
+  // ── Compartilhar um carro: no celular abre o menu do aparelho (WhatsApp incluso); no computador copia ──
+  async function compartilhar(botao) {
+    const c = D.find((x) => x.id === botao.dataset.id); if (!c) return;
+    const url = location.origin + location.pathname + '#carro=' + c.id;
+    const p = sobreFipe(c.dif);
+    const laudo = p == null ? '' : c.dif <= -0.02 ? ` · ${p}% abaixo da FIPE` : c.dif >= 0.02 ? ` · ${p}% acima da FIPE` : ' · na FIPE';
+    const texto = `Mercedes C 300 ${c.ano} ${c.cor.toLowerCase()}, ${c.km ? milKm(c.km) + ', ' : ''}${c.cid || c.uf}: ${c.preco ? reais(c.preco) : 'preço não informado'}${laudo}${c.leilao ? ' (passou por leilão)' : ''}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Garimpo Carro', text: texto, url }); } catch (e) { /* a pessoa fechou o menu */ }
+      return;
+    }
+    const antes = botao.textContent;
+    try { await navigator.clipboard.writeText(texto + '\n' + url); botao.textContent = 'Link copiado'; }
+    catch (e) { window.prompt('Copie o link:', url); }
+    setTimeout(() => (botao.textContent = antes), 2200);
   }
 
   // ── Gaveta da peneira no celular ──
@@ -243,7 +264,11 @@
     $('#tabela-fipe tbody').innerHTML = Object.entries(pacote.fipe.anos).filter(([a]) => D.some((c) => String(c.ano) === a))
       .map(([a, v]) => `<tr><td>${a}</td><td>${reais(v)}</td></tr>`).join('');
 
+    // link de um carro só (#carro=id): lido antes de lerUrl, porque gravarUrl reescreve o endereço
+    const carroAlvo = new URLSearchParams(location.hash.slice(1)).get('carro');
     montarChips(); pepitas(); lerUrl(); sincronizarForm(); desenhar();
+    if (carroAlvo) document.fonts.ready.then(() => setTimeout(() => irPara(carroAlvo, true), 60));
+    $('#linhas').addEventListener('click', (e) => { const b = e.target.closest('.compartilha'); if (b) compartilhar(b); });
 
     $('#peneira').addEventListener('input', (e) => { if (e.target.id !== 'f-cid') lerForm(); });
     let t; $('#f-cid').addEventListener('input', () => { clearTimeout(t); t = setTimeout(lerForm, 180); });
