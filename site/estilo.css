@@ -344,4 +344,11 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
 .fipe-ref { display: inline-block; margin: 0; padding: 0 2px; font: 600 1rem/1 var(--rotulo); letter-spacing: .03em; text-transform: uppercase; color: var(--tinta-2); }
 .fipe-ref b { font-weight: 700; color: var(--tinta-2); font-variant-numeric: tabular-nums; letter-spacing: 0; font-size: 1.15rem; }
 @media (max-width: 1080px) { .fipe-ref { flex-basis: 100%; max-width: max-content; margin-bottom: 2px; } }
-.preco:not(.sem) { display: inline-block; background: var(--ouro-fundo); padding: 6px 10px 4px; border-radius: var(--placa); }
+/* Barra de ouro: o preço achado é o ouro do garimpo. Pintada chapada, em facetas de tinta
+   (tampo claro, frente ouro, quinas escuras), sem degradê nem brilho — é placa, não joia. */
+.preco:not(.sem) { position: relative; isolation: isolate; display: inline-block; padding: 13px 24px 8px; color: var(--tinta); }
+.preco:not(.sem)::before, .preco:not(.sem)::after { content: ""; position: absolute; z-index: -1; }
+.preco:not(.sem)::before { inset: 0; background: #A87C02; clip-path: polygon(9% 0, 91% 0, 100% 100%, 0 100%); }
+.preco:not(.sem)::after { inset: 2px 3px 3px;
+  background: linear-gradient(#F9DA63 0 7px, #C99503 7px 9px, var(--ouro) 9px);
+  clip-path: polygon(calc(9% + 1px) 0, calc(91% - 1px) 0, 100% 100%, 0 100%); }
