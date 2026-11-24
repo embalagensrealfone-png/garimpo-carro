@@ -16,7 +16,9 @@ Junta num lugar só os anúncios espalhados por Webmotors, OLX, Facebook e Insta
 Não é classificado: é o garimpo feito por cima dos classificados. O mesmo carro anunciado em vários sites aparece uma vez, com todos os links; cada anúncio vem com veredito (% da FIPE, leilão, blindado, preço suspeito). Webmotors e OLX não fazem isso entre si.
 
 ## Operating Context
-Curadoria feita pelo dono com apoio de IA, atualizada em lotes (data "entrou na lista" por carro). O site não vende carro nem intermedia: o botão leva ao anúncio original.
+Curadoria feita pelo dono com apoio de IA. A lista é atualizada pelo robô "Minas"
+(`ferramentas/minas.py`, passo a passo em `ferramentas/minas/COMO-RODAR.md`), que roda no Mac do Carlos
+quando ele pede "atualizar minas". O robô marca carro novo, preço que mudou e anúncio que saiu do ar. O site não vende carro nem intermedia: o botão leva ao anúncio original.
 
 ## Capabilities and Constraints
 - Uma foto pequena por carro (capa); as demais ficam no anúncio original. Decisão do dono por causa de direito de imagem dos anunciantes — não mostrar galeria.

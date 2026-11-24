@@ -360,3 +360,61 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
 /* o brilho atravessa o lingote e some; descansa e volta (pedido do Carlos: mexendo sempre) */
 @keyframes brilho-ouro { 0% { background-position: 100% 0, 0 0; } 40%, 100% { background-position: 0% 0, 0 0; } }
 @media (prefers-reduced-motion: reduce) { .preco:not(.sem)::after { animation: none; } }
+
+/* ── Minas: o que mudou na mina desde a última visita (1x por dia por visitante) ── */
+.minas-btn {
+  position: relative; display: inline-flex; align-items: center; gap: 7px;
+  background: var(--ouro); color: var(--tinta); border: 0; border-radius: var(--placa);
+  padding: 8px 13px 8px 10px; font: 700 1rem/1 var(--rotulo); text-transform: uppercase; letter-spacing: .06em; cursor: pointer;
+  box-shadow: 2px 2px 0 #6B5208;
+}
+.minas-btn { white-space: nowrap; }
+.minas-btn svg { flex: none; width: 20px; height: 20px; transform-origin: 70% 80%; }
+.minas-btn:hover svg, .minas-btn.cavando svg { animation: picareta .5s var(--saida) 2; }
+@keyframes picareta { 0% { transform: rotate(0); } 40% { transform: rotate(-28deg); } 70% { transform: rotate(8deg); } 100% { transform: rotate(0); } }
+.minas-btn.feito { background: transparent; color: var(--ouro); box-shadow: inset 0 0 0 1.5px #6B6356; }
+.minas-ponto { position: absolute; top: -4px; right: -4px; width: 11px; height: 11px; border-radius: 50%;
+  background: var(--papel); border: 2.5px solid var(--risco); }
+.selo.baixou { background: var(--papel); color: var(--tinta); box-shadow: inset 0 0 0 1.5px var(--tinta); }
+
+.minas {
+  width: min(560px, calc(100vw - 32px)); max-height: min(86vh, 760px); padding: 20px 22px 16px;
+  background: var(--papel); color: var(--tinta); border: 2px solid var(--tinta); border-radius: var(--placa);
+  box-shadow: 8px 8px 0 var(--tinta); overflow: auto;
+}
+.minas::backdrop { background: rgba(23,20,15,.55); }
+.minas[open] { animation: minas-abre .35s var(--saida); }
+@keyframes minas-abre { from { transform: translateY(14px) rotate(-.6deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.minas-topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.minas-topo h2 { margin: 0; font: 400 1.6rem/1 var(--letreiro); }
+.minas-fecha { background: none; border: 0; font: 400 2rem/1 var(--corpo); color: var(--tinta); cursor: pointer; padding: 0 4px; margin: -6px -6px 0 0; }
+.minas-sub { margin: 6px 0 14px; color: var(--tinta-2); font-size: .95rem; }
+.minas-placar { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 6px; padding: 0; list-style: none; }
+.minas-placar li { flex: 1 1 110px; background: var(--ouro); border-radius: var(--placa); padding: 10px 12px 8px; }
+.minas-placar b { display: block; font: 700 2.2rem/1 var(--rotulo); font-variant-numeric: tabular-nums; }
+.minas-placar span { font: 600 .85rem/1.1 var(--rotulo); text-transform: uppercase; letter-spacing: .06em; color: var(--tinta-ouro); }
+.minas-placar li.saiu { background: var(--cal); }
+.minas-placar li.saiu span { color: var(--tinta-2); }
+.minas h3 { margin: 18px 0 2px; font: 700 1.05rem/1 var(--rotulo); text-transform: uppercase; letter-spacing: .08em; }
+.minas .pepitas-lista { margin-bottom: 4px; }
+.minas .pp s { display: block; font-weight: 500; font-size: .85rem; color: var(--tinta-2); margin-bottom: 3px; }
+.minas .pp em { font-style: normal; font-size: .8rem; margin-top: 4px; color: var(--tinta); background: var(--cal); padding: 2px 5px; border-radius: 2px; }
+.minas-saiu { list-style: none; margin: 0; padding: 0; }
+.minas-saiu li { padding: 8px 0; border-top: 1px solid var(--linha); display: flex; justify-content: space-between; gap: 10px; color: var(--tinta-2); }
+.minas-saiu b { color: var(--tinta); font: 700 1rem/1.2 var(--rotulo); }
+.minas-todos { margin-top: 6px; background: var(--tinta); color: var(--ouro); border: 0; border-radius: var(--placa);
+  padding: 10px 14px; font: 700 .98rem/1 var(--rotulo); text-transform: uppercase; letter-spacing: .05em; cursor: pointer; }
+.minas-vazio { margin: 6px 0; padding: 14px; background: var(--cal); border-radius: var(--placa); }
+.minas-pe { margin: 16px 0 0; padding-top: 10px; border-top: 1px dashed var(--linha); font-size: .85rem; color: var(--tinta-2); }
+@media (max-width: 560px) {
+  .minas-btn { padding: 8px 10px; }
+  .minas { padding: 16px 16px 12px; }
+  .minas-placar b { font-size: 1.8rem; }
+}
+@media (max-width: 560px) {
+  /* com o botão Minas na barra, o contador fica só com o número que sobrou */
+  .contador .ct-de, .contador .ct-seta { display: none; }
+  .ordem select { max-width: 132px; }
+  .minas-saiu li { flex-direction: column; gap: 2px; }
+}
+@media (max-width: 380px) { .abre-peneira, .minas-btn { padding-left: 9px; padding-right: 9px; letter-spacing: .03em; } }

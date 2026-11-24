@@ -18,7 +18,9 @@ def tipo(a):
 
 saida = []
 img_dest = raiz / 'site/img'; img_dest.mkdir(parents=True, exist_ok=True)
+saidos = {c['id']: c for c in carros if c.get('saiu')}
 for c in carros:
+    if c.get('saiu'): continue          # vendido/tirado do ar: some da lista, mas aparece no Minas
     ref = fipe['anos'].get(str(c['ano']))
     dif = round(c['preco'] / ref - 1, 4) if (ref and c['preco']) else None
     alertas = [{'t': a, 'k': tipo(a)} for a in c['al']]
@@ -32,6 +34,7 @@ for c in carros:
         'links': [{'s': l['s'], 'u': l['u']} for l in c['links']
                   if not (c['preco'] and l.get('p') and abs(l['p'] / c['preco'] - 1) > 0.02)],
         'capa': c['capa'],
+        'hist': c.get('hist', []),
     })
     if c['capa']:
         shutil.copyfile(raiz / f"dados/capas-originais/{c['id']}.jpg", img_dest / f"{c['id']}.jpg")
@@ -49,9 +52,25 @@ for c in saida:
     m = km_media.get(c['ano'])
     c['kmrel'] = round(c['km'] / m - 1, 3) if (m and c['km']) else None
 
+# ── Minas: o que mudou nos últimos 30 dias (o botão do site mostra a partir da última visita) ──
+import datetime as dt
+eventos_arq = raiz / 'dados/minas/eventos.json'
+eventos = json.loads(eventos_arq.read_text()) if eventos_arq.exists() else []
+corte = (dt.date.fromisoformat(max(c['dt'] for c in saida)) - dt.timedelta(days=30)).isoformat()
+minas = []
+for n, e in enumerate(eventos):            # n = número de ordem: o navegador guarda até onde a pessoa já viu
+    e = {**e, 'n': n}
+    if e['d'] < corte: continue
+    if e['t'] == 'saiu':
+        c = saidos.get(e['id'])
+        if not c: continue
+        e = {**e, 'ano': c['ano'], 'cor': c['cor'], 'km': c['km'], 'cid': c['cid'], 'uf': c['uf']}
+    minas.append(e)
+
 pacote = {'fipe': {k: fipe[k] for k in ('codigo', 'modelo', 'mes', 'anos')},
           'atualizado': max(c['dt'] for c in saida),
           'km_media': {str(a): v for a, v in km_media.items()},
+          'minas': minas,
           'carros': saida}
 (raiz / 'site/dados.json').write_text(json.dumps(pacote, ensure_ascii=False, separators=(',', ':')))
 print(len(saida), 'carros →', (raiz / 'site/dados.json').stat().st_size // 1024, 'KB')

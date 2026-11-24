@@ -101,6 +101,11 @@ Cantos de placa: 3px. O carimbo é um retângulo com borda dupla, girado -2°.
   (O laudo por reta preço × km foi testado em 23/11/2026 e descartado pelo Carlos: confuso.)
 - **Selo de km**: ao lado da km, "20% menos km que a média da 2024" (verde claro) ou
   "36% mais km…" (terra claro); abaixo de 5% vira "na média". Média = anúncios do mesmo ano.
+- **Minas** (24/11/2026): botão ouro com picareta na barra preta. Abre um painel em papel, no mesmo
+  estilo das pepitas, com o placar (novos, baixaram, saíram) e as listas. Cada visitante minera 1x por
+  dia; depois disso o botão vira "Minas ✓" e só reabre o resultado do dia. Um ponto vermelho no botão
+  avisa que a mina mudou desde a última visita. No cartão do carro, o selo "Baixou R$ X" aparece por
+  30 dias.
 - **Botão de anúncio**: placa preta com letra ouro, um por site; reposts no mesmo site viram
   chips numerados (2, 3) em papel.
 

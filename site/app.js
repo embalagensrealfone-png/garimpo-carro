@@ -84,6 +84,8 @@
     if (c.leilao) selos.insertAdjacentHTML('beforeend', '<span class="selo leilao">Passou por leilão</span>');
     if (c.bl) selos.insertAdjacentHTML('beforeend', '<span class="selo blind">Blindado</span>');
     if (c.dt === ULT) selos.insertAdjacentHTML('beforeend', `<span class="selo novo">Novo · ${dataBR(c.dt)}</span>`);
+    const queda = baixouRecente(c);
+    if (queda) selos.insertAdjacentHTML('beforeend', `<span class="selo baixou">Baixou ${reais(queda)}</span>`);
     if (!selos.children.length) selos.remove();
 
     const fab = c.fab && c.fab !== String(c.ano) ? `${c.fab}/${c.ano}` : String(c.ano);
@@ -257,6 +259,82 @@
     setTimeout(() => (botao.textContent = antes), 2200);
   }
 
+  // ── Minas: o que mudou desde a última visita. Cada visitante minera 1x por dia (pedido do Carlos,
+  // 24/11/2026). O robô (ferramentas/minas.py) é quem confere os sites; o botão só revela o que ele achou.
+  // O limite mora no navegador da pessoa: trocar de navegador "reseta", e tudo bem para o que ele é.
+  let MINAS = [];
+  const hojeLocal = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  const lerMinas = () => { try { return JSON.parse(localStorage.getItem('gc-minas')) || null; } catch (e) { return null; } };
+  const gravarMinas = (v) => { try { localStorage.setItem('gc-minas', JSON.stringify(v)); } catch (e) { /* aba anônima */ } };
+  function baixouRecente(c) {
+    if (!c.hist || !c.hist.length || !c.preco) return 0;
+    const limite = new Date(ULT + 'T12:00'); limite.setDate(limite.getDate() - 30);
+    const h = c.hist.filter((x) => new Date(x.d + 'T12:00') >= limite);
+    return h.length && h[0].p > c.preco ? h[0].p - c.preco : 0;
+  }
+  function estadoBotao() {
+    const st = lerMinas(); const b = $('#minas-btn');
+    const feito = st && st.dia === hojeLocal();
+    b.classList.toggle('feito', !!feito);
+    $('#minas-rot').textContent = feito ? 'Minas ✓' : 'Minas';
+    const ultimoN = MINAS.length ? MINAS[MINAS.length - 1].n : -1;
+    $('#minas-ponto').hidden = feito || (st && st.n >= ultimoN) || !MINAS.length;
+    b.setAttribute('aria-label', feito ? 'Minas: você já minerou hoje. Ver o resultado' : 'Minas: ver o que mudou desde sua última visita');
+  }
+  function itemCarro(c, extra) {
+    return `<li class="pepita-item"><a href="#${c.id}" data-alvo="${c.id}">
+      ${c.capa ? `<img src="img/${c.id}.jpg" alt="" width="64" height="48">` : '<span></span>'}
+      <span><b>C 300 ${c.ano} · ${esc(c.cor)}</b><small>${c.km ? milKm(c.km) + ' · ' : ''}${esc(c.cid || c.uf)}${c.cid ? '/' + c.uf : ''}</small></span>
+      <span class="pp">${extra}</span></a></li>`;
+  }
+  function abrirMinas() {
+    let st = lerMinas();
+    const primeira = !st;
+    const hoje = hojeLocal();
+    let de;
+    if (st && st.dia === hoje) de = st.de;                     // já minerou hoje: mostra o mesmo resultado
+    else {
+      // primeira vez: mostra a última semana; depois, tudo que entrou desde a última mineração
+      if (st) de = st.n;
+      else {
+        const sem = new Date(ULT + 'T12:00'); sem.setDate(sem.getDate() - 7);
+        de = Math.max(-1, ...MINAS.filter((e) => new Date(e.d + 'T12:00') < sem).map((e) => e.n));
+      }
+      st = { dia: hoje, de, n: MINAS.length ? MINAS[MINAS.length - 1].n : -1 };
+      gravarMinas(st);
+      const b = $('#minas-btn'); b.classList.add('cavando'); setTimeout(() => b.classList.remove('cavando'), 1000);
+    }
+    const ev = MINAS.filter((e) => e.n > de);
+    const porId = new Map(D.map((c) => [c.id, c]));
+    const novos = ev.filter((e) => e.t === 'novo' && porId.has(e.id)).map((e) => porId.get(e.id)).sort(ORDENS.fipe);
+    const baixou = ev.filter((e) => e.t === 'baixou' && porId.has(e.id));
+    const saiu = ev.filter((e) => e.t === 'saiu');
+    const placar = [[novos.length, novos.length === 1 ? 'carro novo' : 'carros novos', ''], [baixou.length, 'baixaram de preço', ''], [saiu.length, saiu.length === 1 ? 'saiu do ar' : 'saíram do ar', 'saiu']]
+      .filter(([n]) => n).map(([n, t, k]) => `<li class="${k}"><b>${n}</b><span>${t}</span></li>`).join('');
+    let h = '';
+    if (!ev.length) h = '<p class="minas-vazio">A mina não mudou desde a sua última visita. A lista é conferida nos sites aos poucos: volte amanhã.</p>';
+    else {
+      h += `<ul class="minas-placar">${placar}</ul>`;
+      if (baixou.length) h += `<h3>Baixaram de preço</h3><ol class="pepitas-lista">${baixou.map((e) => itemCarro(porId.get(e.id),
+        `<s>${reais(e.de)}</s>${reais(e.para)}<em>−${reais(e.de - e.para)}</em>`)).join('')}</ol>`;
+      if (novos.length) {
+        h += `<h3>Novos na mina</h3><ol class="pepitas-lista">${novos.slice(0, 6).map((c) => itemCarro(c,
+          `${c.preco ? reais(c.preco) : '—'}${textoLaudo(c) ? `<em class="carimbo ${textoLaudo(c).k}">${textoLaudo(c).titulo}</em>` : ''}`)).join('')}</ol>`;
+        if (novos.length > 6) h += `<button type="button" class="minas-todos" id="minas-todos">Ver os ${novos.length} novos na lista</button>`;
+      }
+      if (saiu.length) h += `<h3>Saíram do ar</h3><ul class="minas-saiu">${saiu.map((e) =>
+        `<li><span><b>C 300 ${e.ano} · ${esc(e.cor)}</b> · ${e.km ? milKm(e.km) + ' · ' : ''}${esc(e.cid || e.uf)}${e.cid ? '/' + e.uf : ''}</span><span>${e.p ? reais(e.p) : ''}</span></li>`).join('')}</ul>`;
+    }
+    $('#minas-corpo').innerHTML = h;
+    const quando = MINAS.length ? dataBR(MINAS[MINAS.length - 1].d) : null;
+    $('#minas-sub').textContent = primeira || st.primeira ? 'O que mudou na mina nos últimos 7 dias.' : 'O que mudou desde a sua última mineração.';
+    if (primeira) { st.primeira = true; gravarMinas(st); }
+    $('#minas-pe').textContent = `Você minera 1 vez por dia: a próxima é amanhã.${quando ? ` Sites conferidos pela última vez em ${quando}.` : ''}`;
+    estadoBotao();
+    const dlg = $('#minas');
+    if (!dlg.open) dlg.showModal();
+  }
+
   // ── Gaveta da peneira no celular ──
   function gaveta(abrir) {
     const pen = $('#peneira');
@@ -279,7 +357,7 @@
       $('#linhas').innerHTML = '<li class="vazio"><p class="vazio-t">Não deu para carregar a lista.</p><p>Verifique a internet e recarregue a página.</p></li>';
       return;
     }
-    D = pacote.carros; ULT = pacote.atualizado;
+    D = pacote.carros; ULT = pacote.atualizado; MINAS = pacote.minas || [];
     $('#h-total').textContent = D.length;
     // o letreiro diz onde garimpamos de verdade, contado dos dados: nunca "Brasil inteiro" sem ser
     const ufs = [...new Set(D.map((c) => c.uf).filter((u) => u && u !== 'Não informado'))];
@@ -307,6 +385,19 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#peneira').classList.contains('aberta')) gaveta(false); });
     document.body.addEventListener('click', (e) => { if (document.body.classList.contains('peneira-aberta') && !e.target.closest('#peneira, #abre-peneira')) gaveta(false); });
     $('#pepitas').addEventListener('click', (e) => { const a = e.target.closest('[data-alvo]'); if (a) { e.preventDefault(); irPara(a.dataset.alvo); } });
+
+    estadoBotao();
+    $('#minas-btn').addEventListener('click', abrirMinas);
+    $('#minas-fecha').addEventListener('click', () => $('#minas').close());
+    $('#minas').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {                                                 // clique fora da caixa fecha
+        const r = e.currentTarget.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) { e.currentTarget.close(); return; }
+      }
+      const a = e.target.closest('[data-alvo]');
+      if (a) { e.preventDefault(); $('#minas').close(); irPara(a.dataset.alvo); return; }
+      if (e.target.id === 'minas-todos') { $('#minas').close(); F = { ...PADRAO, ordem: 'recentes' }; sincronizarForm(); desenhar(); $('#livro').scrollIntoView({ behavior: 'smooth' }); }
+    });
   }
   iniciar();
 })();
