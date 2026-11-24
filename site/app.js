@@ -105,7 +105,10 @@
     const ca = $('.carimbo', li);
     const t = textoLaudo(c);
     if (!t) ca.classList.add('vazio');
-    else { ca.classList.add(t.k); ca.innerHTML = `${t.titulo}<small>${t.ref}</small>`; }
+    else { ca.classList.add(t.k); ca.textContent = t.titulo; }
+    // FIPE em cima do preço: quem lê compara os dois números de cara, e o selo fica só com a %
+    const fr = $('.fipe-ref', li);
+    if (c.fipe && c.preco) fr.innerHTML = `FIPE ${c.ano} <b>${reais(c.fipe)}</b>`; else fr.remove();
 
     const sites = $('.sites', li);
     const comp = $('.compartilha', li); comp.dataset.id = c.id;
