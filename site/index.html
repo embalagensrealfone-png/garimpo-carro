@@ -14,18 +14,18 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Garimpo Carro — Mercedes C 300 peneiradas e comparadas com a FIPE</title>
-<meta name="description" content="As Mercedes-Benz C 300 AMG Line à venda em vários estados num lugar só, cada uma comparada com a tabela FIPE e com alerta de leilão e blindagem.">
+<title>Garimpo Carro — Mercedes C 300 peneiradas, com laudo de preço</title>
+<meta name="description" content="As Mercedes-Benz C 300 AMG Line à venda em vários estados num lugar só, cada uma comparada com o preço de mercado para a quilometragem, com alerta de leilão e blindagem.">
 <meta name="theme-color" content="#F2B705">
-<meta property="og:title" content="Garimpo Carro — C 300 peneiradas e comparadas com a FIPE">
-<meta property="og:description" content="Webmotors, OLX, Facebook, Mercado Livre, Mobiauto e Instagram num lugar só, cada carro com laudo contra a FIPE.">
+<meta property="og:title" content="Garimpo Carro — C 300 peneiradas, com laudo de preço">
+<meta property="og:description" content="Webmotors, OLX, Facebook, Mercado Livre, Mobiauto e Instagram num lugar só, cada carro com laudo de preço pela quilometragem.">
 <!-- prévia no WhatsApp: o endereço da imagem precisa ser completo. Trocar quando o domínio próprio entrar. -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://embalagensrealfone-png.github.io/garimpo-carro/">
 <meta property="og:image" content="https://embalagensrealfone-png.github.io/garimpo-carro/compartilhar.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Garimpo Carro: Mercedes C 300 comparadas com a FIPE">
+<meta property="og:image:alt" content="Garimpo Carro: Mercedes C 300 com laudo de preço">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="apple-touch-icon" href="icone-180.png">
 <link rel="icon" href="icone.svg" type="image/svg+xml">
@@ -50,13 +50,13 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
   <div class="placa-corpo">
     <div class="letreiro-bloco">
       <h1 class="letreiro"><span id="h-total">186</span> C&nbsp;300 peneiradas em <span class="letreiro-2" id="h-onde">SP e no Sul.</span></h1>
-      <p class="placa-sub">Webmotors, OLX, Facebook, Mercado Livre, Mobiauto e Instagram num lugar só.<span class="so-grande"> O mesmo carro em vários sites aparece uma vez, e cada um vem com o laudo: quanto está da FIPE e se passou por leilão.</span></p>
+      <p class="placa-sub">Webmotors, OLX, Facebook, Mercado Livre, Mobiauto e Instagram num lugar só.<span class="so-grande"> O mesmo carro em vários sites aparece uma vez, e cada um vem com o laudo: quanto está abaixo ou acima do preço de mercado para a km dele, e se passou por leilão.</span></p>
       <p class="placa-data">Atualizado em <span id="h-data">—</span></p>
     </div>
 
     <aside class="pepitas" aria-labelledby="pepitas-t">
       <h2 id="pepitas-t" class="pepitas-t">As pepitas de hoje</h2>
-      <p class="pepitas-sub">Mais abaixo da FIPE, sem leilão, sem blindagem e sem alerta de preço.</p>
+      <p class="pepitas-sub">Mais abaixo do preço de mercado para a km, sem leilão e sem alerta de preço.</p>
       <ol id="pepitas" class="pepitas-lista"></ol>
     </aside>
   </div>
@@ -68,7 +68,7 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
   <label class="ordem">
     <span>Ordem</span>
     <select id="ordem">
-      <option value="fipe">Melhor contra a FIPE</option>
+      <option value="fipe">Melhor negócio</option>
       <option value="recentes">Mais recentes</option>
       <option value="preco">Menor preço</option>
       <option value="km">Menor km</option>
@@ -151,7 +151,10 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
   <div class="rodape-grade">
     <section>
       <h2>Como o laudo é feito</h2>
-      <p>O preço pedido no anúncio é comparado com a tabela FIPE do mesmo ano de modelo, <span id="r-fipe">—</span>. Acima de 2% de diferença, o carimbo diz quanto. "Preço bem abaixo da média" é alerta, não elogio: carro muito barato pede vistoria cautelar antes de qualquer conversa.</p>
+      <p>A tabela FIPE não olha a quilometragem, então ela sozinha engana: uma C 300 com 60 mil km "abaixo da FIPE" pode estar só no preço normal do uso. Por isso cada carro é comparado com os iguais a ele: para cada ano, medimos nos anúncios sem leilão, blindagem ou alerta quanto o preço cai a cada 10 mil km e quanto ele varia normalmente.</p>
+      <p>Dentro da variação normal, o carimbo diz "preço normal para a km". Abaixo dela, "abaixo do mercado". Muito abaixo, mais que o dobro da variação, vira "desconfie": carro barato demais pede vistoria cautelar antes de qualquer conversa. Blindado não entra na conta, porque a blindagem muda o preço. É preço pedido, não de venda, e a conta é refeita a cada atualização.</p>
+      <table class="tabela-fipe" id="tabela-mercado"><caption>O mercado medido</caption><thead><tr><th scope="col">Ano</th><th scope="col">Carros</th><th scope="col">Cada 10 mil km</th><th scope="col">Variação normal</th></tr></thead><tbody></tbody></table>
+      <p class="rodape-fipe">FIPE de referência, <span id="r-fipe">—</span>:</p>
       <table class="tabela-fipe" id="tabela-fipe"><caption>FIPE de referência</caption><thead><tr><th scope="col">Ano</th><th scope="col">Valor</th></tr></thead><tbody></tbody></table>
     </section>
     <section>

@@ -6,7 +6,6 @@
   const milKm = (v) => (v >= 1000 ? Math.round(v / 1000) + ' mil' : v) + ' km';
   const semAcento = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const dataBR = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
-  const sobreFipe = (dif) => (dif == null ? null : Math.round(Math.abs(dif) * 100));
 
   let D = [], ULT = '';
   const PADRAO = { semLeilao: true, bl: 'todos', ano: [], uf: [], cor: [], banco: [], preco: 460000, km: 80000, cid: '', ordem: 'fipe' };
@@ -57,11 +56,13 @@
   }
   const ORDENS = {
     // preço suspeito não é o "melhor negócio": vai depois dos limpos, ainda visível
-    fipe: (a, b) => suspeito(a) - suspeito(b) || (a.dif ?? 9) - (b.dif ?? 9),
-    recentes: (a, b) => b.dt.localeCompare(a.dt) || (a.dif ?? 9) - (b.dif ?? 9),
+    // "melhor negócio" = mais abaixo do esperado para a km; os de "desconfie" vão para o fim,
+    // blindados (sem comparação justa) logo antes deles
+    fipe: (a, b) => grupo(a) - grupo(b) || margem(a) - margem(b),
+    recentes: (a, b) => b.dt.localeCompare(a.dt) || margem(a) - margem(b),
     preco: (a, b) => (a.preco || 9e9) - (b.preco || 9e9),
     km: (a, b) => (a.km || 9e9) - (b.km || 9e9),
-    ano: (a, b) => b.ano - a.ano || (a.dif ?? 9) - (b.dif ?? 9),
+    ano: (a, b) => b.ano - a.ano || margem(a) - margem(b),
   };
 
   // ── Desenho ──
@@ -101,12 +102,10 @@
 
     const pr = $('.preco', li);
     if (c.preco) pr.textContent = reais(c.preco); else { pr.textContent = 'Preço não informado'; pr.classList.add('sem'); }
-    const ca = $('.carimbo', li), p = sobreFipe(c.dif);
-    if (p == null) ca.classList.add('vazio');
-    else if (c.dif <= -0.02 && suspeito(c)) { ca.classList.add('suspeito'); ca.innerHTML = `${p}% abaixo · desconfie<small>FIPE ${c.ano}: ${reais(c.fipe)}</small>`; }
-    else if (c.dif <= -0.02) { ca.classList.add('abaixo'); ca.innerHTML = `${p}% abaixo da FIPE<small>FIPE ${c.ano}: ${reais(c.fipe)}</small>`; }
-    else if (c.dif >= 0.02) { ca.classList.add('acima'); ca.innerHTML = `${p}% acima da FIPE<small>FIPE ${c.ano}: ${reais(c.fipe)}</small>`; }
-    else { ca.classList.add('na'); ca.innerHTML = `Na FIPE<small>FIPE ${c.ano}: ${reais(c.fipe)}</small>`; }
+    const ca = $('.carimbo', li);
+    const t = textoLaudo(c);
+    if (!t) ca.classList.add('vazio');
+    else { ca.classList.add(t.k); ca.innerHTML = `${t.titulo}<small>${t.ref}</small>`; }
 
     const sites = $('.sites', li);
     const comp = $('.compartilha', li); comp.dataset.id = c.id;
@@ -128,7 +127,20 @@
     return li;
   }
   // "preço bem abaixo da média" é alerta: o carimbo não pode elogiar o mesmo carro
-  const suspeito = (c) => c.al.some((a) => a.k === 'risco' && /abaixo da m/i.test(a.t));
+  // ── Laudo: o carro contra os iguais a ele (mesmo ano, mesma km), calculado em ferramentas/gerar.py ──
+  const margem = (c) => (c.laudo && c.laudo.m != null ? c.laudo.m : 9);
+  const grupo = (c) => (!c.laudo ? 2 : c.laudo.k === 'desconfie' ? 3 : c.laudo.k === 'blindado' ? 1 : 0);
+  function textoLaudo(c) {
+    const L = c.laudo; if (!L) return null;
+    const fipe = c.fipe ? `FIPE ${c.ano}: ${reais(c.fipe)}` : '';
+    if (L.k === 'blindado') return { k: 'na', titulo: 'Blindado · sem comparação', curto: 'blindado', ref: fipe + ' (sem blindagem)' };
+    const p = Math.round(Math.abs(L.m) * 100);
+    const ref = `Esperado ${L.semkm ? '(km não informada)' : 'para a km'}: ${reais(L.esp)}` + (fipe ? ` · ${fipe}` : '');
+    if (L.k === 'desconfie') return { k: 'suspeito', titulo: `${p}% abaixo · desconfie`, curto: `${p}% abaixo do mercado (bom demais: desconfie)`, ref };
+    if (L.k === 'abaixo') return { k: 'abaixo', titulo: `${p}% abaixo do mercado`, curto: `${p}% abaixo do mercado`, ref };
+    if (L.k === 'acima') return { k: 'acima', titulo: `${p}% acima do mercado`, curto: `${p}% acima do mercado`, ref };
+    return { k: 'na', titulo: 'Preço normal para a km', curto: 'preço normal para a km', ref };
+  }
   function esc(s) { return String(s).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])); }
 
   let ultimoTotal = -1;
@@ -194,13 +206,13 @@
   }
 
   function pepitas() {
-    const top = D.filter((c) => !c.leilao && !c.bl && c.dif != null && c.capa && !c.al.some((a) => a.k === 'risco'))
+    const top = D.filter((c) => c.laudo && c.laudo.k === 'abaixo' && !c.leilao && c.capa && !c.al.some((a) => a.k === 'risco'))
       .sort(ORDENS.fipe).slice(0, 3);
     $('#pepitas').innerHTML = top.map((c) => `
       <li class="pepita-item"><a href="#${c.id}" data-alvo="${c.id}">
         <img src="img/${c.id}.jpg" alt="" width="64" height="48">
         <span><b>C 300 ${c.ano} · ${esc(c.cor)}</b><small>${c.km ? milKm(c.km) + ' · ' : ''}${esc(c.cid || c.uf)}${c.cid ? '/' + c.uf : ''}</small></span>
-        <span class="pp">${reais(c.preco)}<em class="carimbo abaixo">${sobreFipe(c.dif)}% abaixo da FIPE</em></span>
+        <span class="pp">${reais(c.preco)}<em class="carimbo abaixo">${Math.round(Math.abs(c.laudo.m) * 100)}% abaixo do mercado</em></span>
       </a></li>`).join('');
   }
 
@@ -218,8 +230,8 @@
   async function compartilhar(botao) {
     const c = D.find((x) => x.id === botao.dataset.id); if (!c) return;
     const url = location.origin + location.pathname + '#carro=' + c.id;
-    const p = sobreFipe(c.dif);
-    const laudo = p == null ? '' : c.dif <= -0.02 ? ` · ${p}% abaixo da FIPE` : c.dif >= 0.02 ? ` · ${p}% acima da FIPE` : ' · na FIPE';
+    const tl = textoLaudo(c);
+    const laudo = tl ? ` · ${tl.curto}` : '';
     const texto = `Mercedes C 300 ${c.ano} ${c.cor.toLowerCase()}, ${c.km ? milKm(c.km) + ', ' : ''}${c.cid || c.uf}: ${c.preco ? reais(c.preco) : 'preço não informado'}${laudo}${c.leilao ? ' (passou por leilão)' : ''}`;
     if (navigator.share) {
       try { await navigator.share({ title: 'Garimpo Carro', text: texto, url }); } catch (e) { /* a pessoa fechou o menu */ }
@@ -261,6 +273,8 @@
     document.querySelector('.ct-de').textContent = D.length;
     $('#h-data').textContent = new Date(ULT + 'T12:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
     $('#r-fipe').textContent = `código ${pacote.fipe.codigo} (${pacote.fipe.modelo}), referência de ${pacote.fipe.mes}`;
+    $('#tabela-mercado tbody').innerHTML = Object.entries(pacote.mercado || {})
+      .map(([a, v]) => `<tr><td>${a}</td><td>${v.n}</td><td>− ${reais(v.por10mil)}</td><td>± ${reais(v.variacao)}</td></tr>`).join('');
     $('#tabela-fipe tbody').innerHTML = Object.entries(pacote.fipe.anos).filter(([a]) => D.some((c) => String(c.ano) === a))
       .map(([a, v]) => `<tr><td>${a}</td><td>${reais(v)}</td></tr>`).join('');
 

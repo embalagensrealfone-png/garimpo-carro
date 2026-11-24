@@ -337,3 +337,4 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+.rodape-fipe { margin-top: 20px !important; font-size: .9rem; color: #B9B2A4 !important; }
