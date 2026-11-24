@@ -96,12 +96,11 @@ Cantos de placa: 3px. O carimbo é um retângulo com borda dupla, girado -2°.
 
 ## Components
 - **Linha do livro**: foto pequena (4:3) | carro + local + alertas | preço + carimbo FIPE + botões.
-- **Carimbo de mercado** (desde 23/11/2026, no lugar do carimbo FIPE): compara com os iguais —
-  mesmo ano, reta preço × km medida nos anúncios limpos (`ferramentas/gerar.py`).
-  "X% ABAIXO DO MERCADO" (verde, abaixo de 1 variação), "PREÇO NORMAL PARA A KM" (tinta),
-  "X% ACIMA DO MERCADO" (tinta-2), "X% ABAIXO · DESCONFIE" (risco, abaixo de 2 variações),
-  "BLINDADO · SEM COMPARAÇÃO". Linha pequena: esperado para a km e a FIPE de referência.
-  Entra carimbando uma vez. Também aparece nas pepitas, em tamanho compacto.
+- **Carimbo FIPE**: "10% ABAIXO DA FIPE" (verde), "NA FIPE" (tinta), "6% ACIMA DA FIPE" (tinta-2).
+  Linha pequena: FIPE do ano. Entra carimbando uma vez; também nas pepitas, compacto.
+  (O laudo por reta preço × km foi testado em 23/11/2026 e descartado pelo Carlos: confuso.)
+- **Selo de km**: ao lado da km, "20% menos km que a média da 2024" (verde claro) ou
+  "36% mais km…" (terra claro); abaixo de 5% vira "na média". Média = anúncios do mesmo ano.
 - **Botão de anúncio**: placa preta com letra ouro, um por site; reposts no mesmo site viram
   chips numerados (2, 3) em papel.
 

@@ -89,7 +89,7 @@
     const fab = c.fab && c.fab !== String(c.ano) ? `${c.fab}/${c.ano}` : String(c.ano);
     $('.titulo', li).innerHTML = `C 300 ${fab} · ${esc(c.cor)} <small>banco ${esc(c.banco.toLowerCase())}</small>`;
     const onde = c.cid ? `${esc(c.cid)}${c.uf && c.uf !== 'Não informado' ? '/' + c.uf : ''}` : (c.uf !== 'Não informado' ? c.uf : 'Cidade não informada');
-    $('.meta', li).innerHTML = [c.km ? `<b>${milKm(c.km)}</b>` : 'km não informado', onde, `na lista desde ${dataBR(c.dt)}`].join(' · ');
+    $('.meta', li).innerHTML = [c.km ? `<b>${milKm(c.km)}</b> ${textoKm(c)}` : 'km não informado', onde, `na lista desde ${dataBR(c.dt)}`].join(' · ');
 
     const al = $('.alertas', li);
     // risco primeiro: do lado do comprador
@@ -127,19 +127,26 @@
     return li;
   }
   // "preço bem abaixo da média" é alerta: o carimbo não pode elogiar o mesmo carro
-  // ── Laudo: o carro contra os iguais a ele (mesmo ano, mesma km), calculado em ferramentas/gerar.py ──
-  const margem = (c) => (c.laudo && c.laudo.m != null ? c.laudo.m : 9);
-  const grupo = (c) => (!c.laudo ? 2 : c.laudo.k === 'desconfie' ? 3 : c.laudo.k === 'blindado' ? 1 : 0);
+  // ── Laudo: só a % contra a FIPE do ano (pedido do Carlos, 23/11/2026) ──
+  let KM_MEDIA = {};
+  const margem = (c) => (c.dif != null ? c.dif : 9);
+  const grupo = (c) => (c.dif == null ? 1 : 0);
   function textoLaudo(c) {
-    const L = c.laudo; if (!L) return null;
-    const fipe = c.fipe ? `FIPE ${c.ano}: ${reais(c.fipe)}` : '';
-    if (L.k === 'blindado') return { k: 'na', titulo: 'Blindado · sem comparação', curto: 'blindado', ref: fipe + ' (sem blindagem)' };
-    const p = Math.round(Math.abs(L.m) * 100);
-    const ref = `Esperado ${L.semkm ? '(km não informada)' : 'para a km'}: ${reais(L.esp)}` + (fipe ? ` · ${fipe}` : '');
-    if (L.k === 'desconfie') return { k: 'suspeito', titulo: `${p}% abaixo · desconfie`, curto: `${p}% abaixo do mercado (bom demais: desconfie)`, ref };
-    if (L.k === 'abaixo') return { k: 'abaixo', titulo: `${p}% abaixo do mercado`, curto: `${p}% abaixo do mercado`, ref };
-    if (L.k === 'acima') return { k: 'acima', titulo: `${p}% acima do mercado`, curto: `${p}% acima do mercado`, ref };
-    return { k: 'na', titulo: 'Preço normal para a km', curto: 'preço normal para a km', ref };
+    if (c.dif == null) return null;
+    const p = Math.round(Math.abs(c.dif) * 100);
+    const ref = `FIPE ${c.ano}: ${reais(c.fipe)}`;
+    if (c.dif <= -0.02) return { k: 'abaixo', titulo: `${p}% abaixo da FIPE`, curto: `${p}% abaixo da FIPE`, ref };
+    if (c.dif >= 0.02) return { k: 'acima', titulo: `${p}% acima da FIPE`, curto: `${p}% acima da FIPE`, ref };
+    return { k: 'na', titulo: 'Na FIPE', curto: 'na FIPE', ref };
+  }
+  // "20% menos km que a média da 2024 (30 mil km)": abaixo de 5% de diferença conta como na média
+  function textoKm(c) {
+    const m = KM_MEDIA[c.ano]; if (c.kmrel == null || !m) return '';
+    const p = Math.round(Math.abs(c.kmrel) * 100);
+    if (p < 5) return `<span class="kmrel">na média de km da ${c.ano}</span>`;
+    return c.kmrel < 0
+      ? `<span class="kmrel menos" title="Média da ${c.ano}: ${milKm(m)}">${p}% menos km que a média da ${c.ano}</span>`
+      : `<span class="kmrel mais" title="Média da ${c.ano}: ${milKm(m)}">${p}% mais km que a média da ${c.ano}</span>`;
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m])); }
 
@@ -206,13 +213,13 @@
   }
 
   function pepitas() {
-    const top = D.filter((c) => c.laudo && c.laudo.k === 'abaixo' && !c.leilao && c.capa && !c.al.some((a) => a.k === 'risco'))
+    const top = D.filter((c) => c.dif != null && c.dif <= -0.02 && !c.leilao && !c.bl && c.capa && !c.al.some((a) => a.k === 'risco'))
       .sort(ORDENS.fipe).slice(0, 3);
     $('#pepitas').innerHTML = top.map((c) => `
       <li class="pepita-item"><a href="#${c.id}" data-alvo="${c.id}">
         <img src="img/${c.id}.jpg" alt="" width="64" height="48">
         <span><b>C 300 ${c.ano} · ${esc(c.cor)}</b><small>${c.km ? milKm(c.km) + ' · ' : ''}${esc(c.cid || c.uf)}${c.cid ? '/' + c.uf : ''}</small></span>
-        <span class="pp">${reais(c.preco)}<em class="carimbo abaixo">${Math.round(Math.abs(c.laudo.m) * 100)}% abaixo do mercado</em></span>
+        <span class="pp">${reais(c.preco)}<em class="carimbo abaixo">${Math.round(Math.abs(c.dif) * 100)}% abaixo da FIPE</em></span>
       </a></li>`).join('');
   }
 
@@ -273,10 +280,9 @@
     document.querySelector('.ct-de').textContent = D.length;
     $('#h-data').textContent = new Date(ULT + 'T12:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
     $('#r-fipe').textContent = `código ${pacote.fipe.codigo} (${pacote.fipe.modelo}), referência de ${pacote.fipe.mes}`;
-    $('#tabela-mercado tbody').innerHTML = Object.entries(pacote.mercado || {})
-      .map(([a, v]) => `<tr><td>${a}</td><td>${v.n}</td><td>− ${reais(v.por10mil)}</td><td>± ${reais(v.variacao)}</td></tr>`).join('');
+    KM_MEDIA = pacote.km_media || {};
     $('#tabela-fipe tbody').innerHTML = Object.entries(pacote.fipe.anos).filter(([a]) => D.some((c) => String(c.ano) === a))
-      .map(([a, v]) => `<tr><td>${a}</td><td>${reais(v)}</td></tr>`).join('');
+      .map(([a, v]) => `<tr><td>${a}</td><td>${reais(v)}</td><td>${KM_MEDIA[a] ? milKm(KM_MEDIA[a]) : '—'}</td></tr>`).join('');
 
     // link de um carro só (#carro=id): lido antes de lerUrl, porque gravarUrl reescreve o endereço
     const carroAlvo = new URLSearchParams(location.hash.slice(1)).get('carro');
