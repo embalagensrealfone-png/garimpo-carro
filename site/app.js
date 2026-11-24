@@ -136,10 +136,14 @@
   const grupo = (c) => (c.dif == null ? 1 : 0);
   function textoLaudo(c) {
     if (c.dif == null) return null;
-    const p = Math.round(Math.abs(c.dif) * 100);
+    // "Na FIPE" só até R$ 1.000 de diferença, pra mais ou pra menos (Carlos, 23/11/2026).
+    // Diferença menor que 1% ganha uma casa decimal, senão viraria "0% abaixo".
     const ref = `FIPE ${c.ano}: ${reais(c.fipe)}`;
-    if (c.dif <= -0.02) return { k: 'abaixo', titulo: `${p}% abaixo da FIPE`, curto: `${p}% abaixo da FIPE`, ref };
-    if (c.dif >= 0.02) return { k: 'acima', titulo: `${p}% acima da FIPE`, curto: `${p}% acima da FIPE`, ref };
+    if (Math.abs(c.preco - c.fipe) <= 1000) return { k: 'na', titulo: 'Na FIPE', curto: 'na FIPE', ref };
+    const a = Math.abs(c.dif) * 100;
+    const p = a < 0.95 ? a.toFixed(1).replace('.', ',') : Math.round(a);
+    if (c.dif < 0) return { k: 'abaixo', titulo: `${p}% abaixo da FIPE`, curto: `${p}% abaixo da FIPE`, ref };
+    if (c.dif > 0) return { k: 'acima', titulo: `${p}% acima da FIPE`, curto: `${p}% acima da FIPE`, ref };
     return { k: 'na', titulo: 'Na FIPE', curto: 'na FIPE', ref };
   }
   // "20% menos km que a média da 2024 (30 mil km)": abaixo de 5% de diferença conta como na média

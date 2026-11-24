@@ -96,7 +96,7 @@ Cantos de placa: 3px. O carimbo é um retângulo com borda dupla, girado -2°.
 
 ## Components
 - **Linha do livro**: foto pequena (4:3) | carro + local + alertas | preço + carimbo FIPE + botões.
-- **Carimbo FIPE**: "10% ABAIXO DA FIPE" (verde), "NA FIPE" (tinta), "6% ACIMA DA FIPE" (tinta-2).
+- **Carimbo FIPE**: "10% ABAIXO DA FIPE" (verde), "NA FIPE" (tinta, só até R$ 1.000 de diferença), "6% ACIMA DA FIPE" (tinta-2).
   Linha pequena: FIPE do ano. Entra carimbando uma vez; também nas pepitas, compacto.
   (O laudo por reta preço × km foi testado em 23/11/2026 e descartado pelo Carlos: confuso.)
 - **Selo de km**: ao lado da km, "20% menos km que a média da 2024" (verde claro) ou
