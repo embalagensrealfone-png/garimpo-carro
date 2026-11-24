@@ -131,6 +131,12 @@
     "u": "https://carro.mercadolivre.com.br/MLB-5533932869-mercedes-benz-c-300-20-eq-boost-hibrido-amg-line-9g-tronic-_JM",
     "p": 265000,
     "c": "São Paulo"
+   },
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-vermelho-sao-paulo-sao-paulo-10665",
+    "c": "São Paulo",
+    "p": 265000
    }
   ],
   "al": [
@@ -547,6 +553,12 @@
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2023/80497525",
     "p": 275900,
     "c": "Salto"
+   },
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2023-cinza-salto-sao-paulo-80",
+    "c": "Salto",
+    "p": 275900
    }
   ],
   "al": [],
@@ -3310,6 +3322,12 @@
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2025/67981451",
     "p": 328800,
     "c": "Santos"
+   },
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2025-azul-santos-sao-paulo-321",
+    "c": "Santos",
+    "p": 328800
    }
   ],
   "al": [],
@@ -3856,6 +3874,12 @@
     "u": "https://carro.mercadolivre.com.br/MLB-5415525613-mercedes-benz-c-300-20-eq-boost-hibrido-amg-line-9g-tronic-_JM",
     "p": 349900,
     "c": "Ribeirão Preto"
+   },
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-branco-ribeirao-preto-sao-paulo-9258",
+    "c": "Ribeirão Preto",
+    "p": 349900
    }
   ],
   "al": [],
@@ -4140,6 +4164,12 @@
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2025/77543272",
     "p": 364890,
     "c": "Santos"
+   },
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2025-branco-santos-sao-paulo-1875",
+    "c": "Santos",
+    "p": 364890
    }
   ],
   "al": [],
@@ -5569,10 +5599,15 @@
     "s": "Mercado Livre",
     "u": "https://carro.mercadolivre.com.br/MLB-7983547714-_JM",
     "c": "Brasília"
+   },
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-azul-brasilia-distrito-federal-1256",
+    "c": "Brasília"
    }
   ],
   "al": [
-   "Mesmo carro anunciado também a R$ 319.990 no Mercado Livre"
+   "Mesmo carro anunciado também a R$ 319.990 no Mercado Livre e no UsadosBR"
   ],
   "dt": "2026-11-23",
   "id": "c300-188",
@@ -5607,7 +5642,7 @@
   "fab": "",
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Vermelho",
-  "banco": "Não aparece",
+  "banco": "Vermelho",
   "preco": 299900,
   "km": 13000,
   "cid": "Goiânia",
@@ -5619,10 +5654,16 @@
     "u": "https://carro.mercadolivre.com.br/MLB-5321960779-_JM",
     "p": 299900,
     "c": "Goiânia"
+   },
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-vermelho-goiania-goias-811",
+    "c": "Goiânia"
    }
   ],
   "al": [
-   "Único dono, com garantia de fábrica (anúncio)"
+   "Único dono, com garantia de fábrica (anúncio)",
+   "Mesmo carro anunciado também a R$ 309.900 no UsadosBR; interior vermelho e preto, PPF"
   ],
   "dt": "2026-11-23",
   "id": "c300-190",
@@ -5702,6 +5743,226 @@
   ],
   "dt": "2026-11-23",
   "id": "c300-193",
+  "capa": true
+ },
+ {
+  "ano": 2024,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Azul",
+  "banco": "Não aparece",
+  "preco": 329900,
+  "km": 15000,
+  "cid": "Belém",
+  "uf": "PA",
+  "bl": false,
+  "links": [
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-azul-belem-para-717",
+    "p": 329900,
+    "c": "Belém"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-24",
+  "id": "c300-194",
+  "capa": true
+ },
+ {
+  "ano": 2024,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Cinza",
+  "banco": "Não aparece",
+  "preco": 386900,
+  "km": 12000,
+  "cid": "Rio de Janeiro",
+  "uf": "RJ",
+  "bl": true,
+  "links": [
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-cinza-rio-de-janeiro-rio-de-janeiro-37933",
+    "p": 386900,
+    "c": "Rio de Janeiro"
+   }
+  ],
+  "al": [
+   "Blindado (anúncio)"
+  ],
+  "dt": "2026-11-24",
+  "id": "c300-195",
+  "capa": true
+ },
+ {
+  "ano": 2024,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Cinza",
+  "banco": "Não aparece",
+  "preco": 309900,
+  "km": 11617,
+  "cid": "Goiânia",
+  "uf": "GO",
+  "bl": false,
+  "links": [
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-cinza-goiania-goias-26253",
+    "p": 309900,
+    "c": "Goiânia"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-24",
+  "id": "c300-196",
+  "capa": true
+ },
+ {
+  "ano": 2023,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Prata",
+  "banco": "Não aparece",
+  "preco": 329990,
+  "km": 28189,
+  "cid": "Cuiabá",
+  "uf": "MT",
+  "bl": false,
+  "links": [
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-16v-198/2023-prata-cuiaba-mato-grosso-1041",
+    "p": 329990,
+    "c": "Cuiabá"
+   }
+  ],
+  "al": [
+   "No UsadosBR a versão está cadastrada como \"C 300 2.0 16V\"; confira se é a AMG Line híbrida"
+  ],
+  "dt": "2026-11-24",
+  "id": "c300-197",
+  "capa": true
+ },
+ {
+  "ano": 2022,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Preto",
+  "banco": "Não aparece",
+  "preco": 269900,
+  "km": 29992,
+  "cid": "Goiânia",
+  "uf": "GO",
+  "bl": false,
+  "links": [
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2022-preto-goiania-goias-5705",
+    "p": 269900,
+    "c": "Goiânia"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-24",
+  "id": "c300-198",
+  "capa": true
+ },
+ {
+  "ano": 2022,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Cinza",
+  "banco": "Não aparece",
+  "preco": 269900,
+  "km": 47029,
+  "cid": "Goiânia",
+  "uf": "GO",
+  "bl": false,
+  "links": [
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2022-cinza-goiania-goias-6710",
+    "p": 269900,
+    "c": "Goiânia"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-24",
+  "id": "c300-199",
+  "capa": true
+ },
+ {
+  "ano": 2022,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Azul",
+  "banco": "Não aparece",
+  "preco": 284800,
+  "km": 63000,
+  "cid": "Goiânia",
+  "uf": "GO",
+  "bl": false,
+  "links": [
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2022-azul-goiania-goias-1833",
+    "p": 284800,
+    "c": "Goiânia"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-24",
+  "id": "c300-200",
+  "capa": true
+ },
+ {
+  "ano": 2024,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Preto",
+  "banco": "Não aparece",
+  "preco": 319900,
+  "km": 21624,
+  "cid": "Goiânia",
+  "uf": "GO",
+  "bl": false,
+  "links": [
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-preto-goiania-goias-22215",
+    "p": 319900,
+    "c": "Goiânia"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-24",
+  "id": "c300-201",
+  "capa": true
+ },
+ {
+  "ano": 2025,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Azul",
+  "banco": "Não aparece",
+  "preco": 379990,
+  "km": 14440,
+  "cid": "Brasília",
+  "uf": "DF",
+  "bl": false,
+  "links": [
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2025-azul-brasilia-distrito-federal-1291",
+    "p": 379990,
+    "c": "Brasília"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-24",
+  "id": "c300-202",
   "capa": true
  }
 ]
