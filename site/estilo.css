@@ -344,11 +344,19 @@ input[type=range] { width: 100%; accent-color: var(--tinta); height: 28px; margi
 .fipe-ref { display: inline-block; margin: 0; padding: 0 2px; font: 600 1rem/1 var(--rotulo); letter-spacing: .03em; text-transform: uppercase; color: var(--tinta-2); }
 .fipe-ref b { font-weight: 700; color: var(--tinta-2); font-variant-numeric: tabular-nums; letter-spacing: 0; font-size: 1.15rem; }
 @media (max-width: 1080px) { .fipe-ref { flex-basis: 100%; max-width: max-content; margin-bottom: 2px; } }
-/* Barra de ouro: o preço achado é o ouro do garimpo. Pintada chapada, em facetas de tinta
-   (tampo claro, frente ouro, quinas escuras), sem degradê nem brilho — é placa, não joia. */
-.preco:not(.sem) { position: relative; isolation: isolate; display: inline-block; padding: 13px 24px 8px; color: var(--tinta); }
+/* Barra de ouro: o preço achado é o ouro do garimpo. Escolha do Carlos em 23/11/2026 (opção 3):
+   ouro metálico com reflexo, e um brilho que corre UMA vez quando o carro aparece e para no
+   lingote. Exceção consciente ao "sem brilho" do resto da casa — só o achado brilha. */
+.preco:not(.sem) { position: relative; isolation: isolate; display: inline-block; padding: 13px 24px 8px;
+  color: #3B2A00; text-shadow: 0 1px 0 rgba(255,240,180,.7); }
 .preco:not(.sem)::before, .preco:not(.sem)::after { content: ""; position: absolute; z-index: -1; }
-.preco:not(.sem)::before { inset: 0; background: #A87C02; clip-path: polygon(9% 0, 91% 0, 100% 100%, 0 100%); }
-.preco:not(.sem)::after { inset: 2px 3px 3px;
-  background: linear-gradient(#F9DA63 0 7px, #C99503 7px 9px, var(--ouro) 9px);
-  clip-path: polygon(calc(9% + 1px) 0, calc(91% - 1px) 0, 100% 100%, 0 100%); }
+.preco:not(.sem)::before { inset: 0; background: linear-gradient(180deg, #8A6200, #5C4100);
+  clip-path: polygon(9% 0, 91% 0, 100% 100%, 0 100%); }
+.preco:not(.sem)::after { inset: 1px 2px 2px;
+  clip-path: polygon(calc(9% + 1px) 0, calc(91% - 1px) 0, 100% 100%, 0 100%);
+  background:
+    linear-gradient(115deg, transparent 42%, rgba(255,255,255,.95) 50%, transparent 58%) 43% 0 / 250% 100% no-repeat,
+    linear-gradient(180deg, #FFF4B8 0, #F8D65A 10px, #E2AE1C 11px, #F6CC45 35%, #C8920E 70%, #9B6B00 100%);
+  animation: brilho-ouro 1.1s cubic-bezier(.3,.6,.3,1) .5s backwards; }
+@keyframes brilho-ouro { from { background-position: 100% 0, 0 0; } to { background-position: 43% 0, 0 0; } }
+@media (prefers-reduced-motion: reduce) { .preco:not(.sem)::after { animation: none; } }
