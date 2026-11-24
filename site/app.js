@@ -234,6 +234,9 @@
     }
     D = pacote.carros; ULT = pacote.atualizado;
     $('#h-total').textContent = D.length;
+    // o letreiro diz onde garimpamos de verdade, contado dos dados: nunca "Brasil inteiro" sem ser
+    const ufs = [...new Set(D.map((c) => c.uf).filter((u) => u && u !== 'Não informado'))];
+    $('#h-onde').textContent = ufs.every((u) => ['SP', 'PR', 'SC', 'RS'].includes(u)) ? 'SP e no Sul.' : `${ufs.length} estados.`;
     document.querySelector('.ct-de').textContent = D.length;
     $('#h-data').textContent = new Date(ULT + 'T12:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
     $('#r-fipe').textContent = `código ${pacote.fipe.codigo} (${pacote.fipe.modelo}), referência de ${pacote.fipe.mes}`;
