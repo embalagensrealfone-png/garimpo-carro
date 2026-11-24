@@ -1,5 +1,7 @@
 # Publica a pasta site/ no GitHub Pages a cada push no main. Hospedagem grátis: o site é
 # só arquivo estático, não precisa de servidor.
+# Montar e publicar ficam em jobs separados: no mesmo job o deploy às vezes procurava o pacote
+# antes de o GitHub terminar de registrá-lo ("No artifacts named github-pages") e falhava.
 name: Publicar site
 on:
   push:
@@ -13,16 +15,20 @@ concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
-  publicar:
+  montar:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site
+  publicar:
+    needs: montar
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
       - id: deploy
         uses: actions/deploy-pages@v5
