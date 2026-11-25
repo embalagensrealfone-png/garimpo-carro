@@ -159,10 +159,15 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
   </form>
 
   <section class="livro" id="livro" aria-label="Carros garimpados">
+    <div class="aviso-alerta">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <p><b>Alerta no WhatsApp.</b> <span>Entrou C 300 nova ou baixou o preço de uma que passa nesta peneira? A gente te avisa.</span></p>
+      <button type="button" class="aviso-btn" id="alerta-btn" aria-haspopup="dialog" aria-controls="alerta">Quero o alerta</button>
+    </div>
     <ol class="linhas" id="linhas"></ol>
     <div class="vazio" id="vazio" hidden>
       <p class="vazio-t">A peneira ficou vazia.</p>
-      <p>Nenhuma C 300 passa em todos esses filtros juntos. Afrouxe o preço ou a quilometragem, ou <button type="button" class="link" id="limpa2">limpe a peneira</button>.</p>
+      <p>Nenhuma C 300 passa em todos esses filtros juntos. Afrouxe o preço ou a quilometragem, <button type="button" class="link" id="limpa2">limpe a peneira</button> ou <button type="button" class="link" id="alerta-btn2">peça um alerta</button> para saber quando aparecer uma.</p>
     </div>
   </section>
 </main>
@@ -192,6 +197,24 @@ FORM: candidato 7 da lista (casa do garimpo / laudo de teor), staging livro de c
   <p class="minas-sub" id="minas-sub"></p>
   <div id="minas-corpo"></div>
   <p class="minas-pe" id="minas-pe"></p>
+</dialog>
+
+<dialog class="minas alerta" id="alerta" aria-labelledby="alerta-t">
+  <div class="minas-topo">
+    <h2 id="alerta-t">Alerta no WhatsApp</h2>
+    <button type="button" class="minas-fecha" id="alerta-fecha" aria-label="Fechar">×</button>
+  </div>
+  <p class="minas-sub">Quando o Minas conferir os anúncios e achar algo que passa nesta peneira, a gente manda no seu WhatsApp.</p>
+  <h3>Sua peneira</h3>
+  <ul class="alerta-resumo" id="alerta-resumo"></ul>
+  <h3>Avisar quando</h3>
+  <div class="alerta-quando">
+    <label class="troca"><input type="checkbox" id="alerta-novo" checked> <span>Entrar uma C 300 nova</span></label>
+    <label class="troca"><input type="checkbox" id="alerta-baixou" checked> <span>Uma delas baixar de preço</span></label>
+  </div>
+  <p class="busca-erro" id="alerta-erro" role="alert" hidden>Escolha pelo menos um aviso.</p>
+  <button type="button" class="minas-todos alerta-ir" id="alerta-ir">Pedir alerta no WhatsApp</button>
+  <p class="minas-pe">O pedido sai do seu WhatsApp para o nosso, já com a peneira escrita. Para mudar a peneira, peça de novo. Para parar, responda SAIR.</p>
 </dialog>
 
 <template id="t-linha">

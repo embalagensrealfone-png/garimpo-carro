@@ -51,6 +51,27 @@ de publicar, conferir:
 
 Depois, preview local (`python3 -m http.server 5420 --directory site`), commit e push em `main`.
 
+## 4. Avisos do alerta no WhatsApp
+
+Quem clica em **Quero o alerta** na lista manda para o WhatsApp do Garimpo (48 99174-0811) uma mensagem
+com a peneira e um "código do alerta". Para cadastrar, cole a mensagem inteira:
+
+```bash
+python3 ferramentas/alertas.py novo 48999999999 "Nome da pessoa" "<mensagem colada>"
+```
+
+Depois de publicar o Minas:
+
+```bash
+python3 ferramentas/alertas.py avisos
+```
+
+Abre uma página com a mensagem pronta de cada pessoa que teve carro novo ou baixa de preço na peneira
+dela. **Quem envia é o Carlos**, clicando em "Enviar no WhatsApp" em cada uma. Quem responder SAIR:
+`python3 ferramentas/alertas.py tirar <telefone>`. Lista: `python3 ferramentas/alertas.py lista`.
+
+Os telefones ficam em `dados/privado/`, fora do git (o repositório é público).
+
 ## Como o robô decide
 
 - **Mesmo carro**: mesmo estado, ano ±1, km até 300 de diferença e preço até 6%. Para km redonda

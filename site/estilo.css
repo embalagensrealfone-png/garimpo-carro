@@ -670,3 +670,25 @@ a.modelo:hover .modelo-ir span { display: inline-block; transform: translateX(4p
   .procura-t { font-size: 1.45rem; }
   .modelo img { height: 170px; }
 }
+
+/* ── Alerta no WhatsApp: faixa no topo da lista e janela com a peneira escrita ── */
+.aviso-alerta {
+  display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 10px 12px 10px 14px;
+  background: var(--papel); border: 2px solid var(--tinta); border-radius: var(--placa); box-shadow: var(--sombra-pincel);
+}
+.aviso-alerta svg { flex: none; width: 26px; height: 26px; color: var(--tinta); background: var(--ouro); border-radius: 50%; padding: 4px; }
+.aviso-alerta p { margin: 0; flex: 1; font-size: .95rem; line-height: 1.3; color: var(--tinta-2); }
+.aviso-alerta b { color: var(--tinta); font: 700 1rem/1.2 var(--rotulo); text-transform: uppercase; letter-spacing: .04em; }
+.aviso-btn { flex: none; background: var(--tinta); color: var(--ouro); border: 0; border-radius: var(--placa); padding: 10px 14px;
+  font: 700 .95rem/1 var(--rotulo); text-transform: uppercase; letter-spacing: .05em; cursor: pointer; }
+.aviso-btn:hover { background: #000; }
+.alerta-resumo { list-style: none; margin: 4px 0 0; padding: 0; }
+.alerta-resumo li { padding: 6px 0; border-top: 1px solid var(--linha); display: flex; gap: 10px; }
+.alerta-resumo b { min-width: 86px; font: 700 .9rem/1.3 var(--rotulo); text-transform: uppercase; letter-spacing: .05em; }
+.alerta-quando { display: grid; gap: 6px; margin: 6px 0 4px; }
+.alerta-ir { width: 100%; padding: 14px; margin-top: 12px; font-size: 1.02rem; }
+@media (max-width: 560px) {
+  .aviso-alerta { flex-wrap: wrap; }
+  .aviso-alerta p { flex-basis: calc(100% - 40px); }
+  .aviso-btn { width: 100%; }
+}

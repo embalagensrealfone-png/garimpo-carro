@@ -368,6 +368,57 @@
   const hojeLocal = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   const lerMinas = () => { try { return JSON.parse(localStorage.getItem('gc-minas')) || null; } catch (e) { return null; } };
   const gravarMinas = (v) => { try { localStorage.setItem('gc-minas', JSON.stringify(v)); } catch (e) { /* aba anônima */ } };
+  // ── Alerta no WhatsApp: o site é estático, então o pedido vai por mensagem para o nosso número, com a
+  //    peneira escrita e um código no fim. O Carlos cadastra com ferramentas/alertas.py, e depois de cada
+  //    Minas o mesmo script monta as mensagens de quem tem novidade. ──
+  const WHATS = '5548991740811';
+  function resumoPeneira() {
+    const faixa = (a, b, f) => (a && b ? `${f(a)} a ${f(b)}` : a ? `a partir de ${f(a)}` : `até ${f(b)}`);
+    const nomes = (k) => F[k].map((v) => (GRUPOS[k].rot ? GRUPOS[k].rot[v] : v)).join(', ');
+    const r = [];
+    r.push(['Ano', F.ano.length ? [...F.ano].sort().join(', ') : 'qualquer']);
+    r.push(['Preço', F.pmin || F.pmax ? faixa(F.pmin, F.pmax, reais) : 'qualquer']);
+    r.push(['Km', F.kmin || F.kmax ? faixa(F.kmin, F.kmax, (v) => v.toLocaleString('pt-BR')) : 'qualquer']);
+    r.push(['Estados', F.uf.length ? F.uf.join(', ') : 'Brasil todo']);
+    if (F.cid) r.push(['Cidade', F.cid]);
+    if (F.cor.length) r.push(['Cor', nomes('cor')]);
+    if (F.banco.length) r.push(['Banco', nomes('banco')]);
+    if (F.vend.length) r.push(['Vendedor', nomes('vend')]);
+    if (F.site.length) r.push(['Site', nomes('site')]);
+    if (F.bl !== 'todos') r.push(['Blindagem', F.bl === 'sim' ? 'só blindados' : 'sem blindagem']);
+    r.push(['Leilão', F.semLeilao ? 'sem carro de leilão' : 'inclui leilão']);
+    return r;
+  }
+  function codigoPeneira(av) {
+    const p = new URLSearchParams();
+    for (const k of ['ano', 'uf', 'cor', 'banco', 'site', 'vend']) if (F[k].length) p.set(k, F[k].join(','));
+    if (F.pmin) p.set('pmin', F.pmin);
+    if (F.pmax) p.set('preco', F.pmax);
+    if (F.kmin) p.set('kmin', F.kmin);
+    if (F.kmax) p.set('km', F.kmax);
+    if (F.cid) p.set('cid', F.cid);
+    if (F.bl !== 'todos') p.set('bl', F.bl);
+    if (!F.semLeilao) p.set('leilao', '1');
+    p.set('av', av.join(','));
+    return decodeURIComponent(p.toString());
+  }
+  function abrirAlerta() {
+    $('#alerta-resumo').innerHTML = resumoPeneira().map(([k, v]) => `<li><b>${esc(k)}</b> ${esc(v)}</li>`).join('');
+    $('#alerta-erro').hidden = true;
+    $('#alerta').showModal();
+  }
+  function pedirAlerta() {
+    const av = [$('#alerta-novo').checked && 'novo', $('#alerta-baixou').checked && 'baixou'].filter(Boolean);
+    $('#alerta-erro').hidden = !!av.length;
+    if (!av.length) return;
+    const linhas = ['Quero receber alerta da C 300 pelo Garimpo Carro:',
+      ...resumoPeneira().map(([k, v]) => `• ${k}: ${v}`),
+      `• Avisar: ${av.map((a) => (a === 'novo' ? 'carro novo' : 'baixa de preço')).join(' e ')}`,
+      '', `(código do alerta: ${codigoPeneira(av)})`];
+    window.open(`https://wa.me/${WHATS}?text=${encodeURIComponent(linhas.join('\n'))}`, '_blank', 'noopener');
+    $('#alerta').close();
+  }
+
   function baixouRecente(c) {
     if (!c.hist || !c.hist.length || !c.preco) return 0;
     const limite = new Date(ULT + 'T12:00'); limite.setDate(limite.getDate() - 30);
@@ -494,6 +545,11 @@
 
     estadoBotao();
     $('#minas-btn').addEventListener('click', abrirMinas);
+    $('#alerta-btn').addEventListener('click', abrirAlerta);
+    $('#alerta-btn2').addEventListener('click', abrirAlerta);
+    $('#alerta-fecha').addEventListener('click', () => $('#alerta').close());
+    $('#alerta').addEventListener('click', (e) => { if (e.target.id === 'alerta') $('#alerta').close(); });
+    $('#alerta-ir').addEventListener('click', pedirAlerta);
     $('#minas-fecha').addEventListener('click', () => $('#minas').close());
     $('#minas').addEventListener('click', (e) => {
       if (e.target === e.currentTarget) {                                                 // clique fora da caixa fecha
