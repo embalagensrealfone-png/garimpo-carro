@@ -121,12 +121,6 @@
   "bl": false,
   "links": [
    {
-    "s": "Webmotors",
-    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2024/82054126",
-    "p": 265000,
-    "c": "São Paulo"
-   },
-   {
     "s": "Mercado Livre",
     "u": "https://carro.mercadolivre.com.br/MLB-5533932869-mercedes-benz-c-300-20-eq-boost-hibrido-amg-line-9g-tronic-_JM",
     "p": 265000,
@@ -137,6 +131,12 @@
     "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-vermelho-sao-paulo-sao-paulo-10665",
     "c": "São Paulo",
     "p": 265000
+   },
+   {
+    "s": "Webmotors",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2024/82054126",
+    "p": 265000,
+    "c": "São Paulo"
    }
   ],
   "al": [
@@ -144,7 +144,8 @@
   ],
   "dt": "2026-11-22",
   "id": "c300-005",
-  "capa": true
+  "capa": true,
+  "saiu": "2026-11-25"
  },
  {
   "ano": 2022,
@@ -394,7 +395,7 @@
    },
    {
     "s": "Webmotors",
-    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2023/82625807",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2023/82656147",
     "p": 278990,
     "c": "Ribeirão Preto"
    }
@@ -839,7 +840,9 @@
   ],
   "dt": "2026-11-22",
   "id": "c300-028",
-  "capa": true
+  "capa": true,
+  "saiu": "2026-11-25",
+  "vendido": true
  },
  {
   "ano": 2022,
@@ -1348,6 +1351,12 @@
    {
     "s": "Facebook",
     "u": "https://www.facebook.com/marketplace/item/4566912133572546",
+    "p": 289900,
+    "c": "Ponta Grossa"
+   },
+   {
+    "s": "Webmotors",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2022/82628681",
     "p": 289900,
     "c": "Ponta Grossa"
    }
@@ -1969,7 +1978,7 @@
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Vermelho",
   "banco": "Preto",
-  "preco": 299900,
+  "preco": 285900,
   "km": 22577,
   "cid": "São Paulo",
   "uf": "SP",
@@ -1978,7 +1987,7 @@
    {
     "s": "Webmotors",
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2024/81329843",
-    "p": 299900,
+    "p": 285900,
     "c": "São Paulo"
    },
    {
@@ -1997,7 +2006,13 @@
   "al": [],
   "dt": "2026-11-22",
   "id": "c300-061",
-  "capa": true
+  "capa": true,
+  "hist": [
+   {
+    "d": "2026-11-25",
+    "p": 299900
+   }
+  ]
  },
  {
   "ano": 2024,
@@ -3125,7 +3140,7 @@
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Branco",
   "banco": "Caramelo",
-  "preco": 320000,
+  "preco": 310000,
   "km": 39593,
   "cid": "Curitiba",
   "uf": "PR",
@@ -3134,13 +3149,13 @@
    {
     "s": "Webmotors",
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2023-2024/70065844",
-    "p": 320000,
+    "p": 310000,
     "c": "Curitiba"
    },
    {
     "s": "OLX",
     "u": "https://pr.olx.com.br/vi/1326429995",
-    "p": 320000,
+    "p": 310000,
     "c": "Curitiba"
    },
    {
@@ -3152,14 +3167,20 @@
    {
     "s": "Só Carrão",
     "u": "https://www.socarrao.com.br/pr/curitiba/c-300-/branco/3123911",
-    "p": 320000,
+    "p": 310000,
     "c": "Curitiba"
    }
   ],
   "al": [],
   "dt": "2026-11-22",
   "id": "c300-100",
-  "capa": true
+  "capa": true,
+  "hist": [
+   {
+    "d": "2026-11-25",
+    "p": 320000
+   }
+  ]
  },
  {
   "ano": 2024,
@@ -3207,7 +3228,8 @@
   "al": [],
   "dt": "2026-11-22",
   "id": "c300-102",
-  "capa": true
+  "capa": true,
+  "saiu": "2026-11-25"
  },
  {
   "ano": 2024,
@@ -3269,7 +3291,7 @@
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Cinza fosco",
   "banco": "Vermelho",
-  "preco": 324900,
+  "preco": 299900,
   "km": 33000,
   "cid": "Sorocaba",
   "uf": "SP",
@@ -3278,20 +3300,26 @@
    {
     "s": "Webmotors",
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2023-2024/82252770",
-    "p": 324900,
+    "p": 299900,
     "c": "Sorocaba"
    },
    {
     "s": "OLX",
     "u": "https://sp.olx.com.br/vi/1552705599",
-    "p": 324900,
+    "p": 299900,
     "c": "Sorocaba"
    }
   ],
   "al": [],
   "dt": "2026-11-22",
   "id": "c300-105",
-  "capa": true
+  "capa": true,
+  "hist": [
+   {
+    "d": "2026-11-25",
+    "p": 324900
+   }
+  ]
  },
  {
   "ano": 2022,
@@ -3585,7 +3613,8 @@
   "al": [],
   "dt": "2026-11-22",
   "id": "c300-116",
-  "capa": true
+  "capa": true,
+  "saiu": "2026-11-25"
  },
  {
   "ano": 2023,
@@ -4736,7 +4765,7 @@
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Vermelho",
   "banco": "Vermelho",
-  "preco": 386900,
+  "preco": 386000,
   "km": 12000,
   "cid": "Ribeirão Preto",
   "uf": "SP",
@@ -4745,13 +4774,13 @@
    {
     "s": "Webmotors",
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2024/81627813",
-    "p": 386900,
+    "p": 386000,
     "c": "Ribeirão Preto"
    },
    {
     "s": "OLX",
     "u": "https://sp.olx.com.br/vi/1549977022",
-    "p": 395000,
+    "p": 386000,
     "c": "Ribeirão Preto"
    },
    {
@@ -4769,6 +4798,10 @@
    {
     "d": "2026-11-24",
     "p": 395000
+   },
+   {
+    "d": "2026-11-25",
+    "p": 386900
    }
   ]
  },
@@ -6002,18 +6035,6 @@
   "bl": false,
   "links": [
    {
-    "s": "UsadosBR",
-    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2022-preto-goiania-goias-5705",
-    "p": 269900,
-    "c": "Goiânia"
-   },
-   {
-    "s": "Webmotors",
-    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2022/81921150",
-    "p": 269900,
-    "c": "Goiânia"
-   },
-   {
     "s": "Mobiauto",
     "u": "https://www.mobiauto.com.br/comprar/carros/x/mercedes-benz/c-300/2022/x/detalhes/33711471",
     "p": 269900,
@@ -6024,12 +6045,25 @@
     "u": "https://go.olx.com.br/vi/1542463225",
     "p": 269900,
     "c": "Goiânia"
+   },
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2022-preto-goiania-goias-5705",
+    "p": 269900,
+    "c": "Goiânia"
+   },
+   {
+    "s": "Webmotors",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2022/81921150",
+    "p": 269900,
+    "c": "Goiânia"
    }
   ],
   "al": [],
   "dt": "2026-11-24",
   "id": "c300-198",
-  "capa": true
+  "capa": true,
+  "saiu": "2026-11-25"
  },
  {
   "ano": 2022,
@@ -6211,6 +6245,18 @@
     "s": "Webmotors",
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2025/82053796",
     "p": 344900,
+    "c": "Rio de Janeiro"
+   },
+   {
+    "s": "Webmotors",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2025/82664965",
+    "p": 330000,
+    "c": "Rio de Janeiro"
+   },
+   {
+    "s": "OLX",
+    "u": "https://rj.olx.com.br/vi/1555933249",
+    "p": 330000,
     "c": "Rio de Janeiro"
    }
   ],
@@ -6474,6 +6520,12 @@
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2025/80663186",
     "p": 449900,
     "c": "Rio de Janeiro"
+   },
+   {
+    "s": "Mobiauto",
+    "u": "https://www.mobiauto.com.br/comprar/carros/x/mercedes-benz/c-300/2025/x/detalhes/32962715",
+    "p": 439900,
+    "c": "Rio de Janeiro"
    }
   ],
   "al": [],
@@ -6519,7 +6571,7 @@
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Cinza",
   "banco": "Não aparece",
-  "preco": 329000,
+  "preco": 339000,
   "km": 11000,
   "cid": "Uberlândia",
   "uf": "MG",
@@ -6528,7 +6580,7 @@
    {
     "s": "Webmotors",
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2025/79410742",
-    "p": 329000,
+    "p": 339000,
     "c": "Uberlândia"
    }
   ],
@@ -6537,7 +6589,13 @@
   ],
   "dt": "2026-11-24",
   "id": "c300-216",
-  "capa": true
+  "capa": true,
+  "hist": [
+   {
+    "d": "2026-11-25",
+    "p": 329000
+   }
+  ]
  },
  {
   "ano": 2024,
@@ -7517,7 +7575,7 @@
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Cinza",
   "banco": "Não aparece",
-  "preco": 389900,
+  "preco": 369900,
   "km": 18000,
   "cid": "Rio de Janeiro",
   "uf": "RJ",
@@ -7525,15 +7583,21 @@
   "links": [
    {
     "s": "Webmotors",
-    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2024/79113569",
-    "p": 389900,
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2024/82642428",
+    "p": 369900,
     "c": "Rio de Janeiro"
    }
   ],
   "al": [],
   "dt": "2026-11-24",
   "id": "c300-253",
-  "capa": true
+  "capa": true,
+  "hist": [
+   {
+    "d": "2026-11-25",
+    "p": 389900
+   }
+  ]
  },
  {
   "ano": 2022,
@@ -7877,7 +7941,7 @@
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Preto",
   "banco": "Não aparece",
-  "preco": 390000,
+  "preco": 360000,
   "km": 5000,
   "cid": "Brasília",
   "uf": "DF",
@@ -7886,14 +7950,20 @@
    {
     "s": "OLX",
     "u": "https://df.olx.com.br/vi/1537105313",
-    "p": 390000,
+    "p": 360000,
     "c": "Brasília"
    }
   ],
   "al": [],
   "dt": "2026-11-24",
   "id": "c300-267",
-  "capa": true
+  "capa": true,
+  "hist": [
+   {
+    "d": "2026-11-25",
+    "p": 390000
+   }
+  ]
  },
  {
   "ano": 2025,
@@ -8059,7 +8129,7 @@
   "links": [
    {
     "s": "Webmotors",
-    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2022/82613699",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2022/82665408",
     "p": 310000,
     "c": "Rio de Janeiro"
    }
@@ -8110,11 +8180,101 @@
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2024/82612424",
     "p": 278900,
     "c": "Cabedelo"
+   },
+   {
+    "s": "OLX",
+    "u": "https://pb.olx.com.br/vi/1555871037",
+    "p": 278900,
+    "c": "Cabedelo"
    }
   ],
   "al": [],
   "dt": "2026-11-24",
   "id": "c300-276",
+  "capa": true
+ },
+ {
+  "ano": 2024,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Branco",
+  "banco": "Não aparece",
+  "preco": 299900,
+  "km": 26191,
+  "cid": "Goiânia",
+  "uf": "GO",
+  "bl": false,
+  "links": [
+   {
+    "s": "Webmotors",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2024/82653465",
+    "p": 299900,
+    "c": "Goiânia"
+   },
+   {
+    "s": "UsadosBR",
+    "u": "https://www.usadosbr.com/carros-e-utilitarios/mercedes-benz/c-300/2-0-eq-boost-hibrido-amg-line/2024-branco-goiania-goias-25973",
+    "p": 299900,
+    "c": "Goiânia"
+   },
+   {
+    "s": "OLX",
+    "u": "https://go.olx.com.br/vi/1555877040",
+    "p": 299900,
+    "c": "Goiânia"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-25",
+  "id": "c300-277",
+  "capa": true
+ },
+ {
+  "ano": 2023,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Branco",
+  "banco": "Não aparece",
+  "preco": 289900,
+  "km": 46900,
+  "cid": "São Paulo",
+  "uf": "SP",
+  "bl": false,
+  "links": [
+   {
+    "s": "Webmotors",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2023/82645396",
+    "p": 289900,
+    "c": "São Paulo"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-25",
+  "id": "c300-278",
+  "capa": true
+ },
+ {
+  "ano": 2022,
+  "fab": "",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Azul",
+  "banco": "Não aparece",
+  "preco": 308000,
+  "km": 17200,
+  "cid": "Barueri",
+  "uf": "SP",
+  "bl": true,
+  "links": [
+   {
+    "s": "Webmotors",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2022/82648418",
+    "p": 308000,
+    "c": "Barueri"
+   }
+  ],
+  "al": [],
+  "dt": "2026-11-25",
+  "id": "c300-279",
   "capa": true
  }
 ]

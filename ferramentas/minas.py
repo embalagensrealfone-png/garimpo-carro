@@ -140,6 +140,7 @@ def olx():
             if not a or int(a.group(1)) not in ANOS: continue
             # "Reduziu o preço" mostra o antigo e o atual: o atual é o menor
             precos = [num(p) for p in re.findall(r'R\$\s*([\d.]+)', t)]
+            precos = [p for p in precos if p >= 50000]   # "R$ 25" e outros números soltos do cartão não são preço de C 300
             ult = [x for x in re.finditer(r'R\$\s*[\d.]+ \| (?!R\$)([^|]+?) \|', t)
                    if not re.match(r'Online|Avalia|Aceita|\d', x.group(1))]
             out.append({'u': f'https://{uf}.olx.com.br/vi/{oid}', 'id': oid, 'ano': int(a.group(1)), 'km': num(a.group(2)),
@@ -405,7 +406,7 @@ def juntar():
 def conhecidos():
     """Imprime o JS window._k = {id: preço} dos anúncios do Webmotors que já estão na lista."""
     d = json.loads(ARQ.read_text())
-    k = {chave('Webmotors', l['u']): l.get('p') or 0 for c in d if not c.get('saiu') for l in c['links'] if l['s'] == 'Webmotors'}
+    k = {chave('Webmotors', l['u']): l.get('p') or 0 for c in d for l in c['links'] if l['s'] == 'Webmotors'}
     print('window._k=' + json.dumps(k, separators=(',', ':')) + ';Object.keys(_k).length')
 
 
