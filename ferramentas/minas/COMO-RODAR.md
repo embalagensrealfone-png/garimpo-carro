@@ -45,6 +45,8 @@ de publicar, conferir:
 - **Carro que saiu:** abrir o link para confirmar que o anúncio caiu mesmo.
 - **Carros novos:** ver se estão com capa, cor e cidade, e se nenhum duplicou um carro que já existia
   (mesmo estado, km e preço).
+- **Repetidos:** `python3 ferramentas/minas.py repetidos` mostra carros da lista que parecem o mesmo
+  (mesma regra do reanúncio). Com `--juntar`, o mais antigo fica com os anúncios do outro.
 - **Rodada vazia:** se nada mudou, o `juntar` não altera nenhum arquivo.
 
 Depois, preview local (`python3 -m http.server 5420 --directory site`), commit e push em `main`.
@@ -53,6 +55,11 @@ Depois, preview local (`python3 -m http.server 5420 --directory site`), commit e
 
 - **Mesmo carro**: mesmo estado, ano ±1, km até 300 de diferença e preço até 6%. Para km redonda
   (múltiplo de 500), o preço precisa estar a até 2%, ou a km e a cidade precisam ser idênticas.
+- **Reanúncio**: quando os números não batem (o vendedor tirou o anúncio e pôs de novo, às vezes bem
+  mais barato), o robô compara a foto de capa com a dos carros do mesmo estado, ano ±1, km até 1.500
+  de diferença, preço até 25% e cor compatível. Se a foto for a mesma, junta ao carro antigo, e o preço
+  novo entra como "baixou" ou "subiu". Só a foto não basta: tem loja que usa a mesma foto em carros
+  diferentes.
 - **Carro novo**: o site com mais detalhes cria o carro. A ordem é Webmotors, UsadosBR, Só Carrão,
   Mobiauto, OLX. Os outros sites viram links desse carro.
 - **Saiu**: o carro fica sem nenhum anúncio no ar. Ele some da lista e aparece em "Saíram do ar" no

@@ -7,7 +7,7 @@
 #   python3 ferramentas/gerar.py           → monta o site
 #
 # Facebook e Instagram não entram: pedem login. Os carros que só existem lá ficam como estão.
-import html, json, pathlib, re, subprocess, sys, time, urllib.request, datetime as dt
+import html, json, pathlib, re, struct, subprocess, sys, tempfile, time, urllib.request, datetime as dt
 
 raiz = pathlib.Path(__file__).resolve().parent.parent
 COLETA = raiz / 'dados/minas/coleta'
@@ -206,13 +206,61 @@ def mesmo_carro(c, a):
 PRIORIDADE = ['Webmotors', 'UsadosBR', 'Só Carrão', 'Mobiauto', 'OLX', 'Mercado Livre']
 
 
-def capa(idc, url):
+def capa(idc, url, jpg=None):
     tmp = COLETA / f'{idc}.img'
     tmp.write_bytes(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=40).read())
-    jpg = raiz / f'dados/capas-originais/{idc}.jpg'
+    jpg = jpg or raiz / f'dados/capas-originais/{idc}.jpg'
     subprocess.run(['sips', '-s', 'format', 'jpeg', '-s', 'formatOptions', '75', '--resampleWidth', '400', str(tmp), '--out', str(jpg)], check=True, capture_output=True)
     subprocess.run(['sips', '--cropToHeightWidth', '300', '400', str(jpg)], check=True, capture_output=True)
     tmp.unlink()
+
+
+# ── Reanúncio: o vendedor tira o anúncio e põe de novo (às vezes bem mais barato). A km e o preço
+#    podem mudar demais para o mesmo_carro, mas a foto de capa costuma ser a mesma. ──
+def assinatura(jpg):
+    """Foto reduzida a 16x12 em tons de cinza: cada ponto é 1 se for mais claro que a média."""
+    out = pathlib.Path(tempfile.mkstemp(suffix='.bmp')[1])
+    try:
+        subprocess.run(['sips', '-s', 'format', 'bmp', '--resampleHeightWidth', '12', '16', str(jpg), '--out', str(out)],
+                       check=True, capture_output=True)
+        b = out.read_bytes()
+    finally:
+        out.unlink(missing_ok=True)
+    off, = struct.unpack_from('<I', b, 10); w, h = struct.unpack_from('<ii', b, 18); px = struct.unpack_from('<H', b, 28)[0] // 8
+    linha = (w * px + 3) & ~3
+    g = [sum(b[off + y * linha + x * px + k] for k in range(3)) for y in range(abs(h)) for x in range(w)]
+    m = sum(g) / len(g)
+    return [v > m for v in g]
+
+
+_assin = {}
+def assin_carro(c):
+    if c['id'] not in _assin:
+        jpg = raiz / f"dados/capas-originais/{c['id']}.jpg"
+        try: _assin[c['id']] = assinatura(jpg) if jpg.exists() else None
+        except Exception: _assin[c['id']] = None
+    return _assin[c['id']]
+
+
+# medido em 24/11/2026 nas 278 capas: mesma foto dá distância 0 a 7; fotos diferentes, 41 ou mais na
+# maioria. Loja que repete a mesma foto em carros diferentes também dá perto de 0 (c300-237 e c300-239),
+# por isso a foto só vale junto com estado, ano, km e preço parecidos.
+FOTO_IGUAL = 8
+
+def parecido(c, ano, km, preco, uf, cor):
+    if not (c.get('uf') == uf and abs(c['ano'] - ano) <= 1 and c['km'] and km and c['preco'] and preco): return False
+    cores = {c.get('cor'), cor} - {None, '', 'Não informada'}
+    if len(cores) > 1 and not any(a.split()[0] == b.split()[0] for a in cores for b in cores if a != b): return False
+    return abs(c['km'] - km) <= 1500 and abs(c['preco'] / preco - 1) <= 0.25
+
+
+def reanuncio(ativos, a, assin):
+    dist = lambda x, y: sum(p != q for p, q in zip(x, y))
+    for c in ativos:
+        if parecido(c, a['ano'], a['km'], a['p'], a['uf'], a.get('cor')):
+            s = assin_carro(c)
+            if s and dist(s, assin) <= FOTO_IGUAL: return c
+    return None
 
 
 def detalhes(site, a):
@@ -289,10 +337,29 @@ def juntar():
     candidatos.sort(key=lambda x: PRIORIDADE.index(x[0]) if x[0] in PRIORIDADE else 99)
     for site, a in candidatos:
         alvo = next((c for c in ativos if mesmo_carro(c, a)), None)
+        foto = None
+        if not alvo:
+            # não bateu pelos números: confere a foto contra os carros parecidos (reanúncio com outro preço)
+            detalhes(site, a)
+            if a.get('img'):
+                foto = COLETA / f"foto-{chave(site, a['u'])}.jpg"
+                try:
+                    capa('tmp', a['img'], foto)
+                    alvo = reanuncio(ativos, a, assinatura(foto))
+                    if alvo: print(f"  reanúncio: {site} {a['u']} é o {alvo['id']} (mesma foto)")
+                except Exception as e:
+                    print('  sem foto para comparar', a['u'], e); foto = None
         link = {'s': site, 'u': a['u'], 'p': a['p'], 'c': a['cid']}
         if alvo:
+            if foto: foto.unlink(missing_ok=True)
             if not any(chave(site, l['u']) == chave(site, a['u']) for l in alvo['links'] if l['s'] == site):
                 alvo['links'].append(link)
+            # o anúncio que dava o preço caiu nesta rodada e este é o que ficou: o preço do carro passa a ser o dele
+            if alvo['id'] in caiu and a['p'] and a['p'] != alvo['preco'] \
+                    and not any(l.get('p') == alvo['preco'] for l in alvo['links'] if l is not link):
+                alvo.setdefault('hist', []).append({'d': HOJE, 'p': alvo['preco']})
+                ev(t='baixou' if a['p'] < alvo['preco'] else 'subiu', id=alvo['id'], de=alvo['preco'], para=a['p'])
+                alvo['preco'] = a['p']
             if alvo['cor'] == 'Não informada' and a.get('cor') not in (None, '', 'Não informada'): alvo['cor'] = a['cor']
             if not alvo['cid'] and a.get('cid'): alvo['cid'] = a['cid']
             continue
@@ -303,7 +370,9 @@ def juntar():
         elif a.get('garantia'): al.append('Com garantia de fábrica (anúncio)')
         detalhes(site, a); link['c'] = a.get('cid', '')
         tem_capa = False
-        if a.get('img'):
+        if foto and foto.exists():
+            foto.rename(raiz / f'dados/capas-originais/{idc}.jpg'); tem_capa = True
+        elif a.get('img'):
             try: capa(idc, a['img']); tem_capa = True
             except Exception as e: print('  sem capa', idc, e)
         c = {'ano': a['ano'], 'fab': '', 'mod': 'C 300 AMG Line EQ Boost híbrido', 'cor': a.get('cor') or 'Não informada',
@@ -359,7 +428,42 @@ def webmotors(arquivo):
     print(f"Webmotors: saíram {len(snap['saiu'])}, mudou preço {len(snap['preco'])}, fora da lista {len(snap['novos'])}")
 
 
+def repetidos(aplicar=False):
+    """Procura na lista carros que são o mesmo (foto igual + estado, ano, km, preço e cor parecidos).
+    Sem --juntar só mostra. Com --juntar, o carro mais antigo fica com os anúncios do outro."""
+    d = json.loads(ARQ.read_text())
+    ativos = [c for c in d if not c.get('saiu')]
+    dist = lambda x, y: sum(p != q for p, q in zip(x, y))
+    pares = []
+    for i, a in enumerate(ativos):
+        for b in ativos[i + 1:]:
+            if not parecido(a, b['ano'], b['km'], b['preco'], b['uf'], b.get('cor')): continue
+            sa, sb = assin_carro(a), assin_carro(b)
+            if sa and sb and dist(sa, sb) <= FOTO_IGUAL: pares.append((a, b))
+    fora = set()
+    for a, b in pares:
+        if a['id'] in fora or b['id'] in fora: continue
+        print(f"{a['id']} {a['km']} km R$ {a['preco']} {a['cid']}  =  {b['id']} {b['km']} km R$ {b['preco']} {b['cid']}")
+        if not aplicar: continue
+        for l in b['links']:
+            if not any(x['s'] == l['s'] and x['u'] == l['u'] for x in a['links']): a['links'].append(l)
+        for k in ('al', 'hist'):
+            for x in b.get(k) or []:
+                if x not in (a.get(k) or []): a.setdefault(k, []).append(x)
+        if a['cor'] == 'Não informada': a['cor'] = b['cor']
+        a['preco'] = min(a['preco'], b['preco']); a['dt'] = min(a['dt'], b['dt']); a['bl'] = a['bl'] or b['bl']
+        fora.add(b['id'])
+    if aplicar and fora:
+        ARQ.write_text(json.dumps([c for c in d if c['id'] not in fora], ensure_ascii=False, indent=1))
+        if EVENTOS.exists():
+            ev = json.loads(EVENTOS.read_text())
+            EVENTOS.write_text(json.dumps([e for e in ev if e['id'] not in fora], ensure_ascii=False, indent=1))
+        for i in fora: (raiz / f'dados/capas-originais/{i}.jpg').unlink(missing_ok=True)
+    print(f"{len(fora) if aplicar else len(pares)} repetido(s){' juntado(s)' if aplicar else ' (rode com --juntar para juntar)'}")
+
+
 if __name__ == '__main__':
     acao = sys.argv[1]
     if acao == 'webmotors': webmotors(sys.argv[2])
+    elif acao == 'repetidos': repetidos('--juntar' in sys.argv)
     else: {'coletar': coletar, 'juntar': juntar, 'conhecidos': conhecidos}[acao]()
