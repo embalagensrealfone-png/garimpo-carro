@@ -25,6 +25,7 @@ UFS = {'acre': 'AC', 'alagoas': 'AL', 'amapa': 'AP', 'amazonas': 'AM', 'bahia': 
        'rio-grande-do-sul': 'RS', 'rondonia': 'RO', 'roraima': 'RR', 'santa-catarina': 'SC', 'sao-paulo': 'SP',
        'sergipe': 'SE', 'tocantins': 'TO'}
 CORES = ['Preto', 'Branco', 'Cinza', 'Prata', 'Azul', 'Vermelho', 'Verde', 'Marrom', 'Bege']
+sem_acento = lambda s: __import__('unicodedata').normalize('NFD', str(s or '')).encode('ascii', 'ignore').decode().lower()
 num = lambda s: int(re.sub(r'\D', '', s) or 0)
 cor_ok = lambda s: next((c for c in CORES if c.lower() == (s or '').strip().lower()),
                         (s or '').strip().title() if re.fullmatch(r'[A-Za-zÀ-ú ]{3,}', (s or '').strip()) else 'Não informada')
@@ -337,7 +338,11 @@ def juntar():
     novos_carros = 0
     candidatos.sort(key=lambda x: PRIORIDADE.index(x[0]) if x[0] in PRIORIDADE else 99)
     for site, a in candidatos:
-        alvo = next((c for c in ativos if mesmo_carro(c, a)), None)
+        # mais de um carro pode bater: fica o mais parecido (mesma cidade, depois km e preço mais perto).
+        # Antes pegava o primeiro da lista e ligou um anúncio de Ribeirão Preto a um carro de Votorantim.
+        iguais = [c for c in ativos if mesmo_carro(c, a)]
+        alvo = min(iguais, key=lambda c: (sem_acento(c.get('cid')) != sem_acento(a.get('cid')), abs(c['km'] - a['km']),
+                                          abs(c['preco'] - a['p'])), default=None)
         foto = None
         if not alvo:
             # não bateu pelos números: confere a foto contra os carros parecidos (reanúncio com outro preço)
