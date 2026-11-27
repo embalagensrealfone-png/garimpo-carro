@@ -3183,12 +3183,6 @@
     "c": "Curitiba"
    },
    {
-    "s": "Facebook",
-    "u": "https://www.facebook.com/marketplace/item/972301042093941",
-    "p": 320000,
-    "c": "Curitiba"
-   },
-   {
     "s": "Só Carrão",
     "u": "https://www.socarrao.com.br/pr/curitiba/c-300-/branco/3123911",
     "p": 310000,
@@ -3198,13 +3192,7 @@
   "al": [],
   "dt": "2026-11-22",
   "id": "c300-100",
-  "capa": true,
-  "hist": [
-   {
-    "d": "2026-11-25",
-    "p": 320000
-   }
-  ]
+  "capa": true
  },
  {
   "ano": 2024,
@@ -8416,6 +8404,32 @@
   "al": [],
   "dt": "2026-11-27",
   "id": "c300-284",
+  "capa": true
+ },
+ {
+  "ano": 2024,
+  "fab": "2024",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "cor": "Cinza",
+  "banco": "Caramelo",
+  "preco": 320000,
+  "km": 17300,
+  "cid": "Curitiba",
+  "uf": "PR",
+  "bl": false,
+  "links": [
+   {
+    "s": "Facebook",
+    "u": "https://www.facebook.com/marketplace/item/972301042093941",
+    "p": 320000,
+    "c": "Curitiba"
+   }
+  ],
+  "al": [
+   "Pintura cinza fosca original de fábrica e revisões na concessionária (anúncio)"
+  ],
+  "dt": "2026-11-27",
+  "id": "c300-285",
   "capa": true
  }
 ]
