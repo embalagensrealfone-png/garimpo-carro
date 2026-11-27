@@ -1041,12 +1041,6 @@
     "u": "https://www.facebook.com/marketplace/item/1514961717058570",
     "p": 284900,
     "c": "Londrina"
-   },
-   {
-    "s": "Facebook",
-    "u": "https://www.facebook.com/marketplace/item/2015819412454141",
-    "p": 284900,
-    "c": "Londrina"
    }
   ],
   "al": [],
@@ -1725,12 +1719,6 @@
     "u": "https://pr.olx.com.br/vi/1539921002",
     "p": 299000,
     "c": "Curitiba"
-   },
-   {
-    "s": "Facebook",
-    "u": "https://www.facebook.com/marketplace/item/1818336676051118",
-    "p": 299900,
-    "c": "Curitiba"
    }
   ],
   "al": [],
@@ -2322,12 +2310,6 @@
    },
    {
     "s": "Facebook",
-    "u": "https://www.facebook.com/marketplace/item/1490538102932389",
-    "p": 308900,
-    "c": "Bauru"
-   },
-   {
-    "s": "Facebook",
     "u": "https://www.facebook.com/marketplace/item/2314947915737476",
     "p": 308900,
     "c": "Bauru"
@@ -2564,12 +2546,6 @@
     "s": "Webmotors",
     "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2024/82531870",
     "p": 309990,
-    "c": "Curitiba"
-   },
-   {
-    "s": "Facebook",
-    "u": "https://www.facebook.com/marketplace/item/2283885982178609",
-    "p": 310000,
     "c": "Curitiba"
    }
   ],
@@ -3120,12 +3096,6 @@
     "s": "OLX",
     "u": "https://rs.olx.com.br/vi/1552641653",
     "p": 319900,
-    "c": "Porto Alegre"
-   },
-   {
-    "s": "Facebook",
-    "u": "https://www.facebook.com/marketplace/item/935377249232071",
-    "p": 320000,
     "c": "Porto Alegre"
    }
   ],
@@ -4567,12 +4537,6 @@
     "s": "OLX",
     "u": "https://sp.olx.com.br/vi/1543095646",
     "p": 368000,
-    "c": "São Caetano do Sul"
-   },
-   {
-    "s": "Facebook",
-    "u": "https://www.facebook.com/marketplace/item/4512669952279759",
-    "p": 377000,
     "c": "São Caetano do Sul"
    },
    {
@@ -8430,6 +8394,84 @@
   ],
   "dt": "2026-11-27",
   "id": "c300-285",
+  "capa": true
+ },
+ {
+  "ano": 2024,
+  "cor": "Cinza",
+  "banco": "Preto",
+  "preco": 310000,
+  "km": 19500,
+  "cid": "Curitiba",
+  "uf": "PR",
+  "links": [
+   {
+    "s": "Facebook",
+    "u": "https://www.facebook.com/marketplace/item/2283885982178609",
+    "p": 310000,
+    "c": "Curitiba"
+   }
+  ],
+  "al": [
+   "Único dono, revisão dos 20 mil feita (anúncio)"
+  ],
+  "fab": "2024",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "bl": false,
+  "dt": "2026-11-27",
+  "id": "c300-286",
+  "capa": true
+ },
+ {
+  "ano": 2024,
+  "cor": "Azul",
+  "banco": "Preto",
+  "preco": 320000,
+  "km": 25009,
+  "cid": "Porto Alegre",
+  "uf": "RS",
+  "links": [
+   {
+    "s": "Facebook",
+    "u": "https://www.facebook.com/marketplace/item/935377249232071",
+    "p": 320000,
+    "c": "Porto Alegre"
+   }
+  ],
+  "al": [
+   "Único dono, revisões na concessionária, IPVA 2026 pago (anúncio)"
+  ],
+  "fab": "2024",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "bl": false,
+  "dt": "2026-11-27",
+  "id": "c300-287",
+  "capa": true
+ },
+ {
+  "ano": 2024,
+  "cor": "Azul",
+  "banco": "Caramelo",
+  "preco": 299900,
+  "km": 31157,
+  "cid": "Curitiba",
+  "uf": "PR",
+  "links": [
+   {
+    "s": "Facebook",
+    "u": "https://www.facebook.com/marketplace/item/1818336676051118",
+    "p": 299900,
+    "c": "Curitiba"
+   }
+  ],
+  "al": [
+   "Revisada na concessionária, garantia de fábrica até 2027 (anúncio)"
+  ],
+  "fab": "2024",
+  "mod": "C 300 AMG Line EQ Boost híbrido",
+  "bl": false,
+  "dt": "2026-11-27",
+  "id": "c300-288",
   "capa": true
  }
 ]
