@@ -638,7 +638,7 @@
    },
    {
     "s": "Webmotors",
-    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2023/82718504",
+    "u": "https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/2023/82732710",
     "p": 278990,
     "c": "Ribeirão Preto"
    }
@@ -1229,7 +1229,7 @@
   "cor": "Preto",
   "banco": "Caramelo",
   "preco": 288900,
-  "km": 26000,
+  "km": 25000,
   "cid": "São Paulo",
   "uf": "SP",
   "bl": false,
@@ -1805,7 +1805,7 @@
   "cor": "Preto",
   "banco": "Caramelo",
   "preco": 299900,
-  "km": 31000,
+  "km": 31875,
   "cid": "Joinville",
   "uf": "SC",
   "bl": false,
@@ -2713,7 +2713,7 @@
    {
     "s": "Facebook",
     "u": "https://www.facebook.com/marketplace/item/1133065606136243",
-    "p": 314900,
+    "p": 308900,
     "c": "Itajaí"
    },
    {
@@ -2725,7 +2725,7 @@
    {
     "s": "Facebook",
     "u": "https://www.facebook.com/marketplace/item/1690270792661414",
-    "p": 315900,
+    "p": 308900,
     "c": "Itajaí"
    }
   ],
@@ -4752,7 +4752,7 @@
    {
     "s": "Facebook",
     "u": "https://www.facebook.com/marketplace/item/1671526701266970",
-    "p": 395000,
+    "p": 386000,
     "c": "Ribeirão Preto"
    }
   ],
@@ -4793,7 +4793,8 @@
   "al": [],
   "dt": "2026-11-22",
   "id": "c300-157",
-  "capa": true
+  "capa": true,
+  "saiu": "2026-11-27"
  },
  {
   "ano": 2024,
@@ -5796,7 +5797,7 @@
   "cor": "Branco",
   "banco": "Não aparece",
   "preco": 337800,
-  "km": 22900,
+  "km": 22000,
   "cid": "Vila Velha",
   "uf": "ES",
   "bl": false,
@@ -8344,7 +8345,8 @@
   ],
   "dt": "2026-11-27",
   "id": "c300-283",
-  "capa": true
+  "capa": true,
+  "saiu": "2026-11-27"
  },
  {
   "ano": 2025,

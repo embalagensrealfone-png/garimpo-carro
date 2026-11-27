@@ -6,7 +6,9 @@
 window.minas = {
   // 1) lê todas as páginas da busca (Brasil todo) num iframe escondido
   async coletar() {
-    const BUSCA = location.href.split('&page=')[0] + '&page=';
+    // endereço fixo do Brasil todo: o site às vezes volta sozinho para a cidade do Carlos (Içara)
+    const BUSCA = 'https://www.webmotors.com.br/carros/estoque/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic'
+      + '?tipoveiculo=carros&marca1=mercedes-benz&modelo1=c-300&versao1=20-eq-boost-hibrido-amg-line-9g-tronic&page=';
     const espera = (ms) => new Promise((r) => setTimeout(r, ms));
     const ler = (doc) => {
       const out = new Map();
@@ -36,15 +38,19 @@ window.minas = {
       if (!achados.size || todos.size === antes) break;
     }
     this.todos = [...todos.values()];
+    this.linhas = null;
+    if (this.todos.length < 150) return this.todos.length + ' anúncios — POUCO DEMAIS: o site deve ter posto filtro de cidade. Tire o filtro e rode de novo.';
     return this.todos.length + ' anúncios';
   },
-  // 2) compara com o que já temos (window._k = {id: preço}, gerado por `minas.py conhecidos`)
+  // 2) compara com o que já temos (window._k = {id: [preço, km do carro]}, gerado por `minas.py conhecidos`)
   comparar() {
     const viv = new Map(this.todos.map((x) => [x.id, x]));
     this.saiu = Object.keys(_k).filter((i) => !viv.has(i));
-    this.preco = Object.keys(_k).filter((i) => viv.has(i) && viv.get(i).p !== _k[i]).map((i) => [i, viv.get(i).p]);
+    this.preco = Object.keys(_k).filter((i) => viv.has(i) && viv.get(i).p !== _k[i][0]).map((i) => [i, viv.get(i).p]);
+    // anúncio ligado a um carro com km bem diferente: pode ser outro carro (o juntar decide)
+    this.km = Object.keys(_k).filter((i) => viv.has(i) && _k[i][1] && Math.abs(viv.get(i).km - _k[i][1]) > 700).map((i) => viv.get(i));
     this.novos = this.todos.filter((x) => !(x.id in _k) && x.ano >= 2022 && x.ano <= 2025);
-    return `saíram ${this.saiu.length} · mudou preço ${this.preco.length} · não estão na lista ${this.novos.length}`;
+    return `saíram ${this.saiu.length} · mudou preço ${this.preco.length} · km diferente ${this.km.length} · não estão na lista ${this.novos.length}`;
   },
   // 3) abre o anúncio de cada um que não está na lista para pegar cor, blindagem, único dono e garantia.
   //    Demora ~3 s por carro e continua rodando mesmo se a extensão der "timeout": chame de novo até terminar.
@@ -74,6 +80,7 @@ window.minas = {
     if (!this.linhas) {
       const curta = (u) => u.replace('https://image.webmotors.com.br/_fotos/anunciousados/gigante/', '~');
       this.linhas = [...this.saiu.map((i) => `S|${i}`), ...this.preco.map(([i, p]) => `P|${i}|${p}`),
+        ...this.km.map((x) => ['K', x.id, x.ano, x.km, x.cid, x.uf, x.p, curta(x.img)].join('|')),
         ...this.novos.map((x) => { const d = this.det[x.id] || {}; return ['N', x.id, x.ano, x.km, x.cid, x.uf, x.p, d.cor || '', d.fl || '', curta(x.img)].join('|'); })];
     }
     return this.linhas.slice(n * 12, n * 12 + 12).join('\n');

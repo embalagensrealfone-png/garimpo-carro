@@ -205,7 +205,12 @@ def mesmo_carro(c, a):
 
 
 # quem traz mais detalhe cria o carro primeiro; os outros sites só viram link dele
-PRIORIDADE = ['Webmotors', 'UsadosBR', 'Só Carrão', 'Mobiauto', 'OLX', 'Mercado Livre']
+PRIORIDADE = ['Webmotors', 'UsadosBR', 'Só Carrão', 'Mobiauto', 'OLX', 'Mercado Livre', 'Facebook']
+# anúncio com km mais de 1.000 diferente do carro em que está ligado é de outro carro (entre 700 e 1.000: avisa).
+# O mesmo carro em dois sites varia no máximo uns 600 km (km arredondada no Facebook); a azul da Gran Brasil
+# (31.157 km) estava ligada a outra azul de Curitiba com 29.581 km.
+KM_OUTRO = 1000
+KM_AVISO = 700
 
 
 def capa(idc, url, jpg=None):
@@ -292,6 +297,16 @@ def juntar():
     candidatos, caiu, conferidos, mudancas = [], {}, set(), {}
 
     arquivos = sorted(COLETA.glob('*.json'))
+    # km que cada anúncio mostra HOJE, de todos os sites: o anúncio é comparado com o carro E com os outros
+    # anúncios do mesmo carro (a km gravada no carro pode estar velha: a preta de Joinville tinha 31.000
+    # gravado e os anúncios já diziam 31.875 a 32.285)
+    lidas = {}
+    for arq in arquivos:
+        snap = json.loads(arq.read_text())
+        if snap.get('quando') != HOJE: continue
+        fonte = snap['anuncios'] if snap['forma'] == 'completa' else snap.get('km', {}).values()
+        for a in fonte:
+            if a.get('km'): lidas[(snap['site'], chave(snap['site'], a['u']))] = a['km']
     for arq in arquivos:
         snap = json.loads(arq.read_text())
         if snap.get('quando') != HOJE:
@@ -299,6 +314,7 @@ def juntar():
         site = snap['site']; conferidos.add(site)
         if snap['forma'] == 'completa':
             no_ar = {chave(site, a['u']): a for a in snap['anuncios']}
+            vistos = no_ar
             saiu, preco, novos = [], {}, []
             for c in ativos:
                 for l in c['links']:
@@ -311,10 +327,33 @@ def juntar():
                 novos = [a for k, a in no_ar.items() if k not in conhecidos]
         else:
             saiu, preco, novos = snap['saiu'], {str(k): v for k, v in snap['preco'].items()}, snap['novos']
+            vistos = {str(k): a for k, a in snap.get('km', {}).items()}
         for c in ativos:
             for l in list(c['links']):
                 if l['s'] != site: continue
                 k = chave(site, l['u'])
+                a = vistos.get(k) or {}
+                ref = [c['km']] + [lidas[(x['s'], chave(x['s'], x['u']))] for x in c['links']
+                                   if x is not l and (x['s'], chave(x['s'], x['u'])) in lidas]
+                dif = min(abs(a['km'] - r) for r in ref if r) if a.get('km') and c['km'] else 0
+                if k not in saiu and dif > KM_OUTRO:
+                    if any(x is not l for x in c['links']):
+                        # o carro tem outros anúncios que confirmam a km dele: este anúncio é de OUTRO carro.
+                        # Foi assim que uma C 300 cinza fosca de Curitiba ficou escondida dentro de uma branca.
+                        c['links'].remove(l)
+                        if l.get('p') == c['preco'] and c['links'] and not any(x.get('p') == c['preco'] for x in c['links']):
+                            c['preco'] = min(x['p'] for x in c['links'] if x.get('p')) if any(x.get('p') for x in c['links']) else c['preco']
+                        a = {**a, 'u': l['u'], 'p': a.get('p') or l.get('p'), 'cid': a.get('cid') or l.get('c', ''),
+                             'uf': a.get('uf') or c['uf'], 'ano': a.get('ano') or c['ano']}
+                        candidatos.append((site, a))
+                        print(f"  SEPARADO: {site} {l['u']} tem {a['km']} km e estava no {c['id']} ({c['km']} km)")
+                        continue
+                    print(f"  km mudou: {c['id']} tinha {c['km']} km, o anúncio do {site} diz {a['km']} (único anúncio: fica)")
+                    c['km'] = a['km']
+                elif k not in saiu and dif > KM_AVISO:
+                    print(f"  CONFERIR: {site} {l['u']} diz {a['km']} km e o {c['id']} tem {c['km']} km")
+                if k not in saiu and site == 'Webmotors' and a.get('km') and dif <= KM_OUTRO and a['km'] != c['km']:
+                    c['km'] = a['km']                     # o Webmotors é a fonte da km do carro: atualiza
                 if k in saiu:
                     c['links'].remove(l); caiu.setdefault(c['id'], []).append(l)
                 elif k in preco:
@@ -387,7 +426,7 @@ def juntar():
         d.append(c); ativos.append(c); novos_carros += 1
         ev(t='novo', id=idc)
 
-    # carro sem nenhum anúncio no ar saiu da lista (Facebook/Instagram não são conferidos: ficam)
+    # carro sem nenhum anúncio no ar saiu da lista (Instagram não é conferido: fica)
     sairam = 0
     for c in ativos:
         if c['id'] in caiu and not c['links']:
@@ -409,29 +448,79 @@ def juntar():
 
 
 def conhecidos():
-    """Imprime o JS window._k = {id: preço} dos anúncios do Webmotors que já estão na lista."""
+    """Imprime o JS window._k = {id: [preço, km do carro]} dos anúncios do Webmotors que já estão na lista."""
     d = json.loads(ARQ.read_text())
-    k = {chave('Webmotors', l['u']): l.get('p') or 0 for c in d for l in c['links'] if l['s'] == 'Webmotors'}
+    k = {chave('Webmotors', l['u']): [l.get('p') or 0, 0 if c.get('saiu') else c['km']]
+         for c in d for l in c['links'] if l['s'] == 'Webmotors'}
     print('window._k=' + json.dumps(k, separators=(',', ':')) + ';Object.keys(_k).length')
 
 
 def webmotors(arquivo):
     """Lê as fatias coladas do Chrome (linhas S|, P|, N|) e grava dados/minas/coleta/webmotors.json."""
     U = 'https://www.webmotors.com.br/comprar/mercedes-benz/c-300/20-eq-boost-hibrido-amg-line-9g-tronic/4-portas/{}/{}'
-    snap = {'site': 'Webmotors', 'quando': HOJE, 'forma': 'diferenca', 'saiu': [], 'preco': {}, 'novos': []}
+    snap = {'site': 'Webmotors', 'quando': HOJE, 'forma': 'diferenca', 'saiu': [], 'preco': {}, 'novos': [], 'km': {}}
     for ln in pathlib.Path(arquivo).read_text().splitlines():
         f = ln.strip().split('|')
         if f[0] == 'S': snap['saiu'].append(f[1])
         elif f[0] == 'P': snap['preco'][f[1]] = int(f[2])
+        elif f[0] == 'K':
+            _, i, ano, km, cid, uf, p, img = f
+            snap['km'][i] = {'u': U.format(ano, i), 'ano': int(ano), 'km': int(km), 'cid': cid, 'uf': uf, 'p': int(p),
+                             'img': img.replace('~', 'https://image.webmotors.com.br/_fotos/anunciousados/gigante/') if img else ''}
         elif f[0] == 'N':
             _, i, ano, km, cid, uf, p, cor, fl, img = f
             if 'LEIL' in fl: print('ATENÇÃO: anúncio fala de leilão, confira à mão:', i)
             snap['novos'].append({'u': U.format(ano, i), 'ano': int(ano), 'km': int(km), 'cid': cid, 'uf': uf, 'p': int(p),
                                   'cor': cor_ok(cor), 'bl': 'BLIND' in fl, 'unico': 'UNICO' in fl, 'garantia': 'GAR' in fl,
                                   'img': img.replace('~', 'https://image.webmotors.com.br/_fotos/anunciousados/gigante/') if img else ''})
+    total = sum(1 for c in json.loads(ARQ.read_text()) if not c.get('saiu') for l in c['links'] if l['s'] == 'Webmotors')
+    if len(snap['saiu']) > max(20, total * 0.25):
+        return print(f"Webmotors: {len(snap['saiu'])} anúncios 'saíram' de uma vez — leitura incompleta (filtro de cidade?). Nada gravado.")
     COLETA.mkdir(parents=True, exist_ok=True)
     (COLETA / 'webmotors.json').write_text(json.dumps(snap, ensure_ascii=False, indent=1))
-    print(f"Webmotors: saíram {len(snap['saiu'])}, mudou preço {len(snap['preco'])}, fora da lista {len(snap['novos'])}")
+    print(f"Webmotors: saíram {len(snap['saiu'])}, mudou preço {len(snap['preco'])}, km diferente {len(snap['km'])}, "
+          f"fora da lista {len(snap['novos'])}")
+
+
+COR_FB = {'Grey': 'Cinza', 'Gray': 'Cinza', 'Silver': 'Prata', 'Black': 'Preto', 'White': 'Branco', 'Blue': 'Azul',
+          'Red': 'Vermelho', 'Green': 'Verde', 'Brown': 'Marrom', 'Beige': 'Bege'}
+
+
+def facebook(arquivo=None):
+    """Sem arquivo: imprime o JS window._f com os anúncios do Facebook da lista (para o facebook.js).
+    Com arquivo (as fatias F| coladas do Chrome): grava dados/minas/coleta/facebook.json para o juntar."""
+    d = json.loads(ARQ.read_text())
+    links = {chave('Facebook', l['u']).rstrip('/').split('/')[-1]: l
+             for c in d if not c.get('saiu') for l in c['links'] if l['s'] == 'Facebook'}
+    if not arquivo:
+        return print('window._f=' + json.dumps({i: 1 for i in links}, separators=(',', ':')) + ';Object.keys(_f).length')
+    lidos, fora, erro = {}, 0, 0
+    for ln in pathlib.Path(arquivo).read_text().splitlines():
+        f = ln.strip().split('|')
+        if f[0] != 'F' or len(f) < 9: continue
+        lidos[f[1]] = f
+    anuncios = []
+    for i, l in links.items():
+        f = lidos.get(i)
+        if f and f[2] == '1': fora += 1; continue                        # o Facebook diz que saiu do ar
+        if not f or f[2] != '0':                                         # não leu: fica como estava
+            erro += 1; anuncios.append({'u': l['u'], 'p': l.get('p')}); continue
+        if len(f) >= 10: _, _, _, kmc, kmd, cor, p, cid, uf, ano = f[:10]
+        else: _, _, _, kmc, cor, p, cid, uf, ano = f[:9]; kmd = ''
+        ok = lambda x: int(x) if x.isdigit() and 300 <= int(x) < 300000 and not 2015 <= int(x) <= 2030 else 0
+        kmc, kmd = ok(kmc), ok(kmd)
+        # a km da descrição é mais exata (17.300 x 18.000 do campo), mas só vale se estiver perto da do campo
+        km = kmd if kmd and (not kmc or abs(kmd - kmc) <= 3000) else kmc
+        anuncios.append({'u': l['u'], 'p': int(p) if p.isdigit() and 100000 <= int(p) <= 2000000 else l.get('p'),
+                         'km': km, 'cor': COR_FB.get(cor, 'Não informada'),
+                         'cid': l.get('c') if cid and (l.get('c') or '').startswith(cid) else cid, 'uf': uf,
+                         'ano': int(ano) if ano.isdigit() else 0})
+    if erro > len(links) * 0.3:
+        return print(f'Facebook: {erro} de {len(links)} anúncios não foram lidos — algo deu errado (login?). Nada gravado.')
+    COLETA.mkdir(parents=True, exist_ok=True)
+    (COLETA / 'facebook.json').write_text(json.dumps({'site': 'Facebook', 'quando': HOJE, 'forma': 'completa',
+        'so_conferencia': True, 'anuncios': anuncios}, ensure_ascii=False, indent=1))
+    print(f'Facebook: {len(links)} anúncios na lista · {fora} saíram do ar · {erro} não lidos (ficam como estavam)')
 
 
 def repetidos(aplicar=False):
@@ -471,5 +560,6 @@ def repetidos(aplicar=False):
 if __name__ == '__main__':
     acao = sys.argv[1]
     if acao == 'webmotors': webmotors(sys.argv[2])
+    elif acao == 'facebook': facebook(sys.argv[2] if len(sys.argv) > 2 else None)
     elif acao == 'repetidos': repetidos('--juntar' in sys.argv)
     else: {'coletar': coletar, 'juntar': juntar, 'conhecidos': conhecidos}[acao]()

@@ -29,6 +29,21 @@ dele, pela extensão Claude in Chrome.
 6. Ler `minas.fatia(0)`, `minas.fatia(1)`… até vir vazio, juntar tudo num arquivo de texto e rodar
    `python3 ferramentas/minas.py webmotors <arquivo>`.
 
+## 2b. Facebook Marketplace (pelo Chrome do Carlos, ~8 min)
+
+O Facebook não tem busca que o robô leia. Aqui conferimos, um por um, os anúncios do Facebook que já
+estão na lista: se ainda está no ar, o preço e a km (para pegar anúncio ligado ao carro errado).
+
+1. Abrir `https://www.facebook.com/marketplace/` no Chrome dele (conta logada).
+2. Colar `ferramentas/minas/facebook.js` e a saída de `python3 ferramentas/minas.py facebook` na aba.
+3. Rodar `fbminas.conferir()`. Roda sozinho na página (abre cada anúncio numa janela "fbler").
+   Chamar `fbminas.andamento()` até vir "N de N · pronto".
+4. Ler `fbminas.fatia(0)`, `fbminas.fatia(1)`… até vir vazio, juntar num arquivo de texto e rodar
+   `python3 ferramentas/minas.py facebook <arquivo>`. Se mais de 30% não for lido (login caiu), nada
+   é gravado.
+
+Dá para rodar o Facebook e o Webmotors ao mesmo tempo, cada um na sua aba.
+
 ## 3. Juntar, conferir, publicar
 
 ```bash
@@ -47,6 +62,12 @@ de publicar, conferir:
   (mesmo estado, km e preço).
 - **Repetidos:** `python3 ferramentas/minas.py repetidos` mostra carros da lista que parecem o mesmo
   (mesma regra do reanúncio). Com `--juntar`, o mais antigo fica com os anúncios do outro.
+- **SEPARADO / CONFERIR / km mudou** (linhas do `juntar`): leia cada uma.
+  - **SEPARADO:** o anúncio tem km mais de 1.000 diferente do carro em que estava ligado. O robô tirou o
+    anúncio desse carro e tratou como outro. Se virou carro novo sem capa (Facebook), tirar print da foto
+    principal no Chrome e salvar em `dados/capas-originais/<id>.jpg` (400×300).
+  - **CONFERIR:** a diferença é de 700 a 1.000 km. Abra os dois anúncios e compare foto e cor.
+  - **km mudou:** o carro só tinha esse anúncio, e a km dele foi atualizada.
 - **Rodada vazia:** se nada mudou, o `juntar` não altera nenhum arquivo.
 
 Depois, preview local (`python3 -m http.server 5420 --directory site`), commit e push em `main`.
@@ -74,6 +95,12 @@ Os telefones ficam em `dados/privado/`, fora do git (o repositório é público)
 
 ## Como o robô decide
 
+- **Anúncio no carro errado**: a cada rodada a km de cada anúncio (OLX, UsadosBR, Só Carrão, Mobiauto,
+  Webmotors e Facebook) é comparada com a do carro em que está ligado. Mais de 1.000 km de diferença =
+  outro carro: o anúncio é separado (se o carro tem outros anúncios) e passa pelas regras abaixo como
+  anúncio novo. Já aconteceu: uma C 300 cinza fosca de Curitiba ficou escondida dentro de uma branca.
+- **Link que o Carlos mandar**: abrir o anúncio e comparar km, cor e foto com o carro antes de dizer que
+  "já está na lista". Preço e cidade parecidos não bastam.
 - **Mesmo carro**: mesmo estado, ano ±1, km até 300 de diferença e preço até 6%. Para km redonda
   (múltiplo de 500), o preço precisa estar a até 2%, ou a km e a cidade precisam ser idênticas.
 - **Reanúncio**: quando os números não batem (o vendedor tirou o anúncio e pôs de novo, às vezes bem
@@ -82,10 +109,10 @@ Os telefones ficam em `dados/privado/`, fora do git (o repositório é público)
   novo entra como "baixou" ou "subiu". Só a foto não basta: tem loja que usa a mesma foto em carros
   diferentes.
 - **Carro novo**: o site com mais detalhes cria o carro. A ordem é Webmotors, UsadosBR, Só Carrão,
-  Mobiauto, OLX. Os outros sites viram links desse carro.
+  Mobiauto, OLX, Mercado Livre, Facebook. Os outros sites viram links desse carro.
 - **Saiu**: o carro fica sem nenhum anúncio no ar. Ele some da lista e aparece em "Saíram do ar" no
-  Minas por 30 dias. Carro de Facebook ou Instagram nunca sai sozinho, porque esses sites não são
-  conferidos.
+  Minas por 30 dias. Anúncio do Facebook sai quando o próprio Facebook diz que ele não está mais
+  disponível; anúncio que não abriu fica como estava. Instagram não é conferido.
 - **Preço**: o preço do carro só muda quando um anúncio dele mudou nesta rodada. O preço antigo vai
   para `hist`, e o cartão no site mostra o selo "Baixou R$ X".
 - A coleta aplicada vai para `dados/minas/coleta/feito-AAAA-MM-DD/`. Assim, rodar o `juntar` de novo
