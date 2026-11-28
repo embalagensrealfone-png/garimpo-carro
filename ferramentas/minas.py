@@ -376,10 +376,14 @@ def juntar():
     n = max(int(c['id'].split('-')[1]) for c in d)
     novos_carros = 0
     candidatos.sort(key=lambda x: PRIORIDADE.index(x[0]) if x[0] in PRIORIDADE else 99)
+    # carro que saiu nos últimos 30 dias também entra na comparação: o vendedor tira o anúncio e põe de novo
+    # (em 27/11 a prata de Brasília "saiu" de manhã e voltou à noite com outro número e 1.200 km a mais)
+    limite = (dt.date.today() - dt.timedelta(days=30)).isoformat()
+    voltaram = [c for c in d if c.get('saiu') and c['saiu'] >= limite]
     for site, a in candidatos:
         # mais de um carro pode bater: fica o mais parecido (mesma cidade, depois km e preço mais perto).
         # Antes pegava o primeiro da lista e ligou um anúncio de Ribeirão Preto a um carro de Votorantim.
-        iguais = [c for c in ativos if mesmo_carro(c, a)]
+        iguais = [c for c in ativos + voltaram if mesmo_carro(c, a)]
         alvo = min(iguais, key=lambda c: (sem_acento(c.get('cid')) != sem_acento(a.get('cid')), abs(c['km'] - a['km']),
                                           abs(c['preco'] - a['p'])), default=None)
         foto = None
@@ -390,11 +394,21 @@ def juntar():
                 foto = COLETA / f"foto-{chave(site, a['u'])}.jpg"
                 try:
                     capa('tmp', a['img'], foto)
-                    alvo = reanuncio(ativos, a, assinatura(foto))
+                    alvo = reanuncio(ativos + voltaram, a, assinatura(foto))
                     if alvo: print(f"  reanúncio: {site} {a['u']} é o {alvo['id']} (mesma foto)")
                 except Exception as e:
                     print('  sem foto para comparar', a['u'], e); foto = None
         link = {'s': site, 'u': a['u'], 'p': a['p'], 'c': a['cid']}
+        if alvo and alvo.get('saiu'):
+            # voltou: sai de "Saíram do ar", os links mortos dão lugar ao novo e a km/preço passam a ser os de hoje
+            print(f"  VOLTOU: {site} {a['u']} é o {alvo['id']}, que tinha saído em {alvo['saiu']}")
+            eventos[:] = [e for e in eventos if not (e['id'] == alvo['id'] and e['t'] == 'saiu' and e['d'] == alvo['saiu'])]
+            del alvo['saiu']; alvo['links'] = []; voltaram.remove(alvo); ativos.append(alvo)
+            if a.get('km'): alvo['km'] = a['km']
+            if a['p'] and a['p'] != alvo['preco']:
+                alvo.setdefault('hist', []).append({'d': HOJE, 'p': alvo['preco']})
+                ev(t='baixou' if a['p'] < alvo['preco'] else 'subiu', id=alvo['id'], de=alvo['preco'], para=a['p'])
+                alvo['preco'] = a['p']
         if alvo:
             if foto: foto.unlink(missing_ok=True)
             if not any(chave(site, l['u']) == chave(site, a['u']) for l in alvo['links'] if l['s'] == site):

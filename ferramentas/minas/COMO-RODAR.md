@@ -108,6 +108,10 @@ Os telefones ficam em `dados/privado/`, fora do git (o repositório é público)
   de diferença, preço até 25% e cor compatível. Se a foto for a mesma, junta ao carro antigo, e o preço
   novo entra como "baixou" ou "subiu". Só a foto não basta: tem loja que usa a mesma foto em carros
   diferentes.
+- **Voltou**: carro que saiu nos últimos 30 dias também entra nas regras de "mesmo carro" e "reanúncio".
+  Se o anúncio novo for ele, o carro volta para a lista (sai de "Saíram do ar") com a km e o preço do
+  anúncio novo, e o `juntar` imprime VOLTOU. Já aconteceu: a prata de Brasília "saiu" de manhã e voltou
+  à noite com outro número no Webmotors.
 - **Carro novo**: o site com mais detalhes cria o carro. A ordem é Webmotors, UsadosBR, Só Carrão,
   Mobiauto, OLX, Mercado Livre, Facebook. Os outros sites viram links desse carro.
 - **Saiu**: o carro fica sem nenhum anúncio no ar. Ele some da lista e aparece em "Saíram do ar" no
