@@ -510,7 +510,7 @@
       $('#linhas').innerHTML = '<li class="vazio"><p class="vazio-t">Não deu para carregar a lista.</p><p>Verifique a internet e recarregue a página.</p></li>';
       return;
     }
-    D = pacote.carros; ULT = pacote.atualizado; MINAS = pacote.minas || [];
+    D = pacote.carros.filter((c) => c.links && c.links.length); ULT = pacote.atualizado; MINAS = pacote.minas || [];   // carro sem link travava a página
     $('#h-total').textContent = D.length;
     // o letreiro diz onde garimpamos de verdade, contado dos dados: nunca "Brasil inteiro" sem ser
     const ufs = [...new Set(D.map((c) => c.uf).filter((u) => u && u !== 'Não informado'))];

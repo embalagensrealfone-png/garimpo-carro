@@ -440,6 +440,18 @@ def juntar():
         d.append(c); ativos.append(c); novos_carros += 1
         ev(t='novo', id=idc)
 
+    # o anúncio que dava o preço caiu e os que sobraram pedem outro valor (mais de 2%): o preço do carro passa a
+    # ser o menor deles. Sem isso o site esconde esses links (gerar.py) e o carro fica sem nenhum — em 27/11
+    # isso travou a página inteira (c300-006 e c300-134)
+    for c in ativos:
+        ps = [l['p'] for l in c['links'] if l.get('p')]
+        if c['preco'] and ps and not any(abs(x / c['preco'] - 1) <= 0.02 for x in ps):
+            novo = min(ps)
+            c.setdefault('hist', []).append({'d': HOJE, 'p': c['preco']})
+            ev(t='baixou' if novo < c['preco'] else 'subiu', id=c['id'], de=c['preco'], para=novo)
+            print(f"  preço segue o anúncio que sobrou: {c['id']} {c['preco']} -> {novo}")
+            c['preco'] = novo
+
     # carro sem nenhum anúncio no ar saiu da lista (Instagram não é conferido: fica)
     sairam = 0
     for c in ativos:

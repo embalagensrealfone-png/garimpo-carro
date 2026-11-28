@@ -31,8 +31,10 @@ for c in carros:
         'fipe': ref, 'dif': dif, 'dt': c['dt'], 'al': alertas,
         # link com preço mais de 2% longe do preço do carro é quase sempre OUTRO carro da
         # mesma loja que entrou junto na coleta; mostrar faria um carro virar três
+        # (nunca zera: carro sem link nenhum trava a página inteira)
         'links': [{'s': l['s'], 'u': l['u']} for l in c['links']
-                  if not (c['preco'] and l.get('p') and abs(l['p'] / c['preco'] - 1) > 0.02)],
+                  if not (c['preco'] and l.get('p') and abs(l['p'] / c['preco'] - 1) > 0.02)]
+                 or [{'s': l['s'], 'u': l['u']} for l in c['links']],
         'capa': c['capa'],
         'hist': c.get('hist', []),
     })

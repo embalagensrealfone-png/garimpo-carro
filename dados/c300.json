@@ -165,7 +165,7 @@
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Prata",
   "banco": "Preto",
-  "preco": 268900,
+  "preco": 295990,
   "km": 72486,
   "cid": "São Paulo",
   "uf": "SP",
@@ -186,6 +186,10 @@
    {
     "d": "2026-11-26",
     "p": 267900
+   },
+   {
+    "d": "2026-11-27",
+    "p": 268900
    }
   ]
  },
@@ -4063,7 +4067,7 @@
   "mod": "C 300 AMG Line EQ Boost híbrido",
   "cor": "Cinza",
   "banco": "Preto",
-  "preco": 356000,
+  "preco": 375000,
   "km": 3979,
   "cid": "Sorocaba",
   "uf": "SP",
@@ -4079,7 +4083,13 @@
   "al": [],
   "dt": "2026-11-22",
   "id": "c300-134",
-  "capa": true
+  "capa": true,
+  "hist": [
+   {
+    "d": "2026-11-27",
+    "p": 356000
+   }
+  ]
  },
  {
   "ano": 2023,
